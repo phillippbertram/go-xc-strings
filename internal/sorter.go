@@ -4,10 +4,32 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
 )
+
+func SortStringsFiles(path string) error {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		return err
+	}
+
+	if fileInfo.IsDir() {
+		return filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if !info.IsDir() && filepath.Ext(path) == ".strings" {
+				return SortStringsFile(path)
+			}
+			return nil
+		})
+	} else {
+		return SortStringsFile(path)
+	}
+}
 
 func SortStringsFile(filepath string) error {
 	entries, err := parseStringsFile(filepath)

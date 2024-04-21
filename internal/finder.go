@@ -9,8 +9,8 @@ import (
 )
 
 // FindUnusedKeys locates keys in the .strings file that are not referenced in Swift files.
-func FindUnusedKeys(stringsPath, swiftDirectory string, ignorePatterns []string) ([]string, error) {
-	entries, err := parseStringsFile(stringsPath)
+func FindUnusedKeys(referenceStringsPath, swiftDirectory string, ignorePatterns []string) ([]string, error) {
+	entries, err := parseStringsFile(referenceStringsPath)
 	if err != nil {
 		return nil, err
 	}
