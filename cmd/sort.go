@@ -26,35 +26,37 @@ var sortCmd = &cobra.Command{
 		sort path/to/directory
 
 		# sort a specific .strings file
-		sort Localizable.strings
+		sort path1/Localizable.strings path2/InfoPlist.strings
 	`),
-	Args: cobra.MaximumNArgs(1), // Allows zero or one argument only
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// Determine the path to sort
-		var path string
-		if len(args) == 1 {
-			path = args[0]
-		} else {
+		var paths []string
+		if len(args) == 0 {
 			// If no argument is provided, use the current directory
 			var err error
-			path, err = os.Getwd()
+			wd, err := os.Getwd()
 			if err != nil {
 				return fmt.Errorf("error getting current directory: %w", err)
 			}
+			paths = []string{wd}
+
+		} else {
+			paths = append(paths, args...)
 		}
 
-		// Make sure the path is absolute
-		absPath, err := filepath.Abs(path)
-		if err != nil {
-			return fmt.Errorf("error resolving path: %w", err)
+		for _, pattern := range paths {
+			// Expand the glob pattern to match files and directories
+			matches, err := filepath.Glob(pattern)
+			if err != nil {
+				return fmt.Errorf("error processing glob pattern '%s': %w", pattern, err)
+			}
+			for _, match := range matches {
+				err := internal.SortStringsFiles(match)
+				if err != nil {
+					return fmt.Errorf("error sorting files in '%s': %w", match, err)
+				}
+			}
 		}
-
-		// Sort the files
-		err = internal.SortStringsFiles(absPath)
-		if err != nil {
-			return fmt.Errorf("error sorting .strings files: %w", err)
-		}
-
 		fmt.Println("Sorting completed successfully.")
 		return nil
 	},
