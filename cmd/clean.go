@@ -10,7 +10,7 @@ import (
 	"phillipp.io/go-xc-strings/internal"
 )
 
-var shouldSort bool
+var skipSort bool
 var stringsPath string
 
 // TODO: var dryRun bool
@@ -47,7 +47,7 @@ in the specified directory and subdirectories, removes them, and optionally sort
 		s.Start()
 
 		// Clean and optionally sort the .strings files
-		if err := internal.CleanAndSortStringsFiles(stringsPath, stringsReferencePath, swiftDirectory, ignorePatterns, shouldSort); err != nil {
+		if err := internal.CleanAndSortStringsFiles(stringsPath, stringsReferencePath, swiftDirectory, ignorePatterns, !skipSort); err != nil {
 			return fmt.Errorf("error cleaning .strings files: %w", err)
 		}
 
@@ -62,6 +62,6 @@ func init() {
 	cleanCmd.Flags().StringVarP(&swiftDirectory, "swift-dir", "d", "", "Path to the directory containing Swift files (.)")
 	cleanCmd.Flags().StringVar(&stringsPath, "strings", "", "Path to the directory containing the Localizable.string files (.)")
 	cleanCmd.Flags().StringSliceVarP(&ignorePatterns, "ignore", "i", []string{}, "Glob patterns for files or directories to ignore")
-	cleanCmd.Flags().BoolVarP(&shouldSort, "sort", "s", false, "Sort the .strings files after cleaning")
+	cleanCmd.Flags().BoolVarP(&skipSort, "skip-sort", "s", false, "Skip sort the .strings files")
 	// TODO: cleanCmd.Flags().BoolVar(&dryRun, "dry-run", false, "Simulate the changes without applying them")
 }
