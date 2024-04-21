@@ -16,7 +16,7 @@ var ignorePatterns []string
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "xc-strings",
-	Short:   "A tool for managing localization strings in Swift projects",
+	Short:   "A tool for cleaning localization strings in Swift projects",
 	Version: config.Version,
 }
 

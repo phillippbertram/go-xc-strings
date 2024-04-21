@@ -1,4 +1,4 @@
-# XC-Strings
+# xc-strings
 
 `xc-strings` is a command-line tool designed to help Swift developers manage and optimize their localization files. 
 It provides functionalities to find unused localization keys, clean them from `.strings` files, and optionally sort the keys in these files for better organization.
@@ -32,7 +32,7 @@ go build -o xc-strings
 To find and report unused localization keys:
 
 ```bash
-./xc-strings find -s path/to/Localizable.strings -d path/to/swift/files
+./xc-strings find -r path/to/Localizable.strings -d path/to/swift/files
 ```
 
 ### Cleaning `.strings` Files
