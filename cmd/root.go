@@ -8,7 +8,7 @@ import (
 )
 
 // Global variables to hold flag values for commands
-var stringsPath string
+var stringsReferencePath string
 var swiftDirectory string
 var ignorePatterns []string
 

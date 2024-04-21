@@ -24,7 +24,7 @@ var findCmd = &cobra.Command{
 		if swiftDirectory == "" {
 			swiftDirectory = "."
 		}
-		if stringsPath == "" {
+		if stringsReferencePath == "" {
 			return fmt.Errorf("please specify the path to the .strings file and the directory containing Swift files")
 		}
 
@@ -33,7 +33,7 @@ var findCmd = &cobra.Command{
 		s.Suffix = " Searching for unused keys..."
 		s.Start()
 
-		unusedKeys, err := internal.FindUnusedKeys(stringsPath, swiftDirectory, ignorePatterns)
+		unusedKeys, err := internal.FindUnusedKeys(stringsReferencePath, swiftDirectory, ignorePatterns)
 		s.Stop()
 		if err != nil {
 			return fmt.Errorf("error finding unused keys: %v", err)
@@ -54,7 +54,7 @@ var findCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(findCmd)
-	findCmd.PersistentFlags().StringVarP(&stringsPath, "strings", "s", "", "Path to the Localizable.strings file (required)")
-	findCmd.PersistentFlags().StringVarP(&swiftDirectory, "swift-dir", "d", "", "Path to the directory containing Swift files (.)")
-	findCmd.PersistentFlags().StringSliceVarP(&ignorePatterns, "ignore", "i", []string{}, "Glob patterns for files or directories to ignore")
+	findCmd.Flags().StringVarP(&stringsReferencePath, "reference", "r", "", "Path to the Localizable.strings file which is used as reference for finding unused keys (required)")
+	findCmd.Flags().StringVarP(&swiftDirectory, "swift-dir", "d", "", "Path to the directory containing Swift files (.)")
+	findCmd.Flags().StringSliceVarP(&ignorePatterns, "ignore", "i", []string{}, "Glob patterns for files or directories to ignore")
 }

@@ -13,9 +13,11 @@ import (
 var sortCmd = &cobra.Command{
 	Use:   "sort [path]",
 	Short: "Sorts and groups keys in .strings files",
-	Long: `Sorts keys alphabetically in a .strings file and groups them by prefix.
-If a directory path is provided, it sorts all .strings files within that directory.
-If a file path is provided, it sorts that specific file.`,
+	Long: heredoc.Doc(`
+	Sorts keys alphabetically in a .strings file and groups them by prefix.
+	If a directory path is provided, it sorts all .strings files within that directory.
+	If a file path is provided, it sorts that specific file.
+	`),
 	Example: heredoc.Doc(`
 		# sort all .strings files in the current directory and its subdirectories
 		sort
