@@ -9,6 +9,39 @@ It provides functionalities to find unused localization keys, clean them from `.
 - **Clean `.strings` Files**: Removes unused keys from `.strings` files.
 - **Sort `.strings` Files**: Optionally sorts keys in `.strings` files to maintain a consistent order.
 
+### Sorting `.strings` Files
+
+`Localizable.strings` before
+```text
+"welcome_screen_title"= "Hello";
+
+"settings_screen_title" ="Settings";
+"settings_screen_logout_button_title" ="logout";
+
+"settings_screen_theme_light"="Light";
+
+"general_dialog_ok"="OK";
+"settings_screen_theme_dark"="Dark";
+```
+
+Sorting the `.strings` file:
+```bash
+$ xc-strings sort Localizable.strings
+```
+
+`Localizable.strings` after sorting
+```text
+"general_dialog_ok"="OK";
+
+"settings_screen_logout_button_title"="logout";
+"settings_screen_theme_dark"="Dark";
+"settings_screen_theme_light"="Light";
+"settings_screen_title"="Settings";
+
+"welcome_screen_title"="Hello";
+```
+
+
 ## Installation
 
 ### Prerequisites
