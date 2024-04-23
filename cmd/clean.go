@@ -18,8 +18,8 @@ var stringsPath string
 var cleanCmd = &cobra.Command{
 	Use:   "clean",
 	Short: "Cleans unused localization keys from .strings files",
-	Long: `This command searches for unused localization keys within .strings files
-in the specified directory and subdirectories, removes them, and optionally sorts the files.`,
+	Long: `Searches for unused localization keys within .strings files
+in the specified directory and subdirectories, removes them, and also sorts the files.`,
 	Example: heredoc.Doc(`
 		# clean all .strings files in the current directory and its subdirectories
 		clean

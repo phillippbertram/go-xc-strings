@@ -8,7 +8,6 @@ import (
 	"strings"
 )
 
-// First implement functionality to identify unused keys similar to the 'find' command logic
 func CleanAndSortStringsFiles(stringsPath, stringsReferencePath, swiftDirectory string, ignorePatterns []string, sortFiles bool) error {
 	// Detect unused keys
 	unusedKeys, err := FindUnusedKeys(stringsReferencePath, swiftDirectory, ignorePatterns)
@@ -19,7 +18,7 @@ func CleanAndSortStringsFiles(stringsPath, stringsReferencePath, swiftDirectory 
 
 	// using a map here as a more efficient data structure
 	// to have a O(1) average-time complexity check instead of O(n)
-	unusedKeysMap := sliceToMap(unusedKeys)
+	unusedKeysMap := SliceToMap(unusedKeys)
 
 	if len(unusedKeysMap) == 0 {
 		fmt.Print("No unused keys found, skipping deletion\n")
@@ -31,7 +30,7 @@ func CleanAndSortStringsFiles(stringsPath, stringsReferencePath, swiftDirectory 
 		return nil
 	}
 
-	// Walk through directory to process .strings files
+	// CLEAN AND SORT
 	err = filepath.Walk(stringsPath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -45,6 +44,7 @@ func CleanAndSortStringsFiles(stringsPath, stringsReferencePath, swiftDirectory 
 				}
 			}
 
+			// sort the file if requested
 			if sortFiles {
 				fmt.Printf("Sorting %s\n", path)
 				if err := SortStringsFile(path); err != nil {

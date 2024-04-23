@@ -86,7 +86,7 @@ func writeSortedStringsFile(filepath string, entries []Entry) error {
 				return err
 			}
 		}
-		_, err := file.WriteString(fmt.Sprintf("\"%s\" = \"%s\";\n", entry.key, entry.value))
+		_, err := file.WriteString(fmt.Sprintf("\"%s\"=\"%s\";\n", entry.key, entry.value))
 		if err != nil {
 			return err
 		}
