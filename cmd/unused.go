@@ -12,7 +12,7 @@ import (
 )
 
 var findCmd = &cobra.Command{
-	Use:   "unused -s <Localizable.strings> [-d <path to swift code>] [-i <ignore pattern>...]",
+	Use:   "unused -r <Localizable.strings> [-d <path to swift code>] [-i <ignore pattern>...]",
 	Short: "Finds unused keys in .strings files",
 	Long: heredoc.Doc(
 		`Check for localization keys defined in a .strings file that are not used in any Swift file within a specified directory.`),
@@ -20,6 +20,7 @@ var findCmd = &cobra.Command{
 		unused -r Localizable.strings
 		unused -r Localizable.strings -d Sources/MyApp -i "Pods/*" "Carthage/*" "*.generated.swift"
 	`),
+	Args: cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if swiftDirectory == "" {
 			swiftDirectory = "."
