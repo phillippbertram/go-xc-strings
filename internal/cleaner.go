@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
+
 	"strings"
 )
 
@@ -77,7 +77,7 @@ func removeUnusedKeys(data []byte, unusedKeys map[string]struct{}) ([]byte, erro
 	var modifiedData []byte
 	lines := strings.Split(string(data), "\n")
 	for _, line := range lines {
-		key := extractKeyFromLine(line)
+		key, _ := extractKeyValue(line)
 
 		if _, exists := unusedKeys[key]; !exists {
 			modifiedData = append(modifiedData, line...)
@@ -85,14 +85,4 @@ func removeUnusedKeys(data []byte, unusedKeys map[string]struct{}) ([]byte, erro
 		}
 	}
 	return modifiedData, nil
-}
-
-// Utility function to extract key from a .strings file line
-func extractKeyFromLine(line string) string {
-	regex := regexp.MustCompile(`^"([^"]+)"`)
-	matches := regex.FindStringSubmatch(line)
-	if len(matches) > 1 {
-		return matches[1] // Return the first group which is the key
-	}
-	return "" // Return an empty string if no match is found
 }

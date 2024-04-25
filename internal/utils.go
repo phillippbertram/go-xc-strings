@@ -54,7 +54,7 @@ func FindDefaultLanguageForXcodeProject(projectPath string) (string, error) {
 	return language, nil
 }
 
-// findPBXProjPath locates the .pbxproj file starting from the given path.
+// locates the .pbxproj file starting from the given path.
 // If the path directly ends with .pbxproj, it returns the path.
 // Otherwise, it searches within the directory and its subdirectories.
 func findPBXProjPath(basePath string) (string, error) {
@@ -96,7 +96,7 @@ func findPBXProjPath(basePath string) (string, error) {
 	return foundPath, nil
 }
 
-// findDevelopmentRegionInPbxProj searches for the developmentRegion in an Xcode project.pbxproj file.
+// searches for the developmentRegion in an Xcode project.pbxproj file.
 func findDevelopmentRegionInPbxProj(filepath string) (string, error) {
 	file, err := os.Open(filepath)
 	if err != nil {
@@ -140,4 +140,15 @@ func GetLocalizableStringsPath(baseDir, devRegion string) (string, error) {
 	}
 
 	return lprojPath, nil
+}
+
+// extracts the key and value from a single line of a .strings file.
+func extractKeyValue(line string) (string, string) {
+	parts := strings.SplitN(line, "=", 2)
+	if len(parts) < 2 {
+		return "", ""
+	}
+	key := strings.Trim(parts[0], " \"")
+	value := strings.Trim(parts[1], " \";")
+	return key, value
 }

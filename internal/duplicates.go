@@ -77,17 +77,6 @@ func processFileForDuplicates(filePath string) (map[string]string, error) {
 	return duplicates, nil
 }
 
-// extractKeyValue extracts the key and value from a single line of a .strings file.
-func extractKeyValue(line string) (string, string) {
-	parts := strings.SplitN(line, "=", 2)
-	if len(parts) < 2 {
-		return "", ""
-	}
-	key := strings.Trim(parts[0], " \"")
-	value := strings.Trim(parts[1], " \";")
-	return key, value
-}
-
 // RemoveDuplicates removes all but the first occurrence of each duplicate key.
 func RemoveDuplicates(basePath string, duplicates DuplicatesMap) error {
 	for filePath, dupKeys := range duplicates {
