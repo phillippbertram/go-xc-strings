@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"phillipp.io/go-xc-strings/internal"
 )
@@ -36,25 +37,27 @@ var duplicatesCmd = &cobra.Command{
 			return err
 		}
 		if len(duplicates) == 0 {
-			fmt.Println("No duplicate keys found.")
+			color.Green("No duplicate keys found.")
 			return nil
 		}
+
+		fileColor := color.New(color.FgCyan, color.Bold)
+		keyColor := color.New(color.FgYellow)
+		valueColor := color.New(color.FgGreen)
 
 		if removeDuplicates {
 			err = internal.RemoveDuplicates(path, duplicates)
 			if err != nil {
 				return fmt.Errorf("failed to remove duplicates: %w", err)
 			}
-			fmt.Println("Duplicates removed successfully.")
+			color.Green("Duplicates removed successfully.")
 		} else {
-			if len(duplicates) == 0 {
-				fmt.Println("No duplicate keys found.")
-				return nil
-			}
+
 			for file, keys := range duplicates {
-				fmt.Printf("Duplicates in %s:\n", file)
+				fileColor.Printf("Duplicates in %s:\n", file)
 				for key, values := range keys {
-					fmt.Printf("%s: %s\n", key, strings.Join(values, ", "))
+					keyColor.Printf("%s: ", key)
+					valueColor.Printf("%s\n", strings.Join(values, " || "))
 				}
 				fmt.Println()
 			}
