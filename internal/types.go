@@ -1,6 +1,6 @@
 package internal
 
-type Entry struct {
+type StringsEntry struct {
 	key   string
 	value string
 }

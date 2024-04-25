@@ -46,26 +46,26 @@ func SortStringsFile(filepath string) error {
 	return writeSortedStringsFile(filepath, entries)
 }
 
-func parseStringsFile(filepath string) ([]Entry, error) {
+func parseStringsFile(filepath string) ([]StringsEntry, error) {
 	file, err := os.Open(filepath)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
 
-	var entries []Entry
+	var entries []StringsEntry
 	scanner := bufio.NewScanner(file)
 	regex := regexp.MustCompile(`"(.+?)"\s*=\s*"(.*?)";`)
 	for scanner.Scan() {
 		matches := regex.FindStringSubmatch(scanner.Text())
 		if len(matches) > 1 {
-			entries = append(entries, Entry{key: matches[1], value: matches[2]})
+			entries = append(entries, StringsEntry{key: matches[1], value: matches[2]})
 		}
 	}
 	return entries, scanner.Err()
 }
 
-func writeSortedStringsFile(filepath string, entries []Entry) error {
+func writeSortedStringsFile(filepath string, entries []StringsEntry) error {
 	file, err := os.Create(filepath)
 	if err != nil {
 		return err
