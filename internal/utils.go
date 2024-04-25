@@ -152,3 +152,9 @@ func extractKeyValue(line string) (string, string) {
 	value := strings.Trim(parts[1], " \";")
 	return key, value
 }
+
+// Helper function to extract a key from a line.
+func extractKey(line string) string {
+	key, _ := extractKeyValue(line)
+	return key
+}
