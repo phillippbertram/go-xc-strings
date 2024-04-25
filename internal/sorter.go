@@ -46,11 +46,6 @@ func SortStringsFile(filepath string) error {
 	return writeSortedStringsFile(filepath, entries)
 }
 
-type Entry struct {
-	key   string
-	value string
-}
-
 func parseStringsFile(filepath string) ([]Entry, error) {
 	file, err := os.Open(filepath)
 	if err != nil {
