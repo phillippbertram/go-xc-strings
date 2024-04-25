@@ -11,7 +11,9 @@ import (
 	"phillipp.io/go-xc-strings/internal"
 )
 
-var findCmd = &cobra.Command{
+var removeUnused bool
+
+var unusedCmd = &cobra.Command{
 	Use:   "unused -r <Localizable.strings> [-d <path to swift code>] [-i <ignore pattern>...]",
 	Short: "Finds unused keys in .strings files",
 	Long: heredoc.Doc(
@@ -34,20 +36,26 @@ var findCmd = &cobra.Command{
 		s.Suffix = " Searching for unused keys..."
 		s.Start()
 
-		unusedKeys, err := internal.FindUnusedKeys(stringsReferencePath, swiftDirectory, ignorePatterns)
-		s.Stop()
-		if err != nil {
-			return fmt.Errorf("error finding unused keys: %v", err)
-		}
-
-		if len(unusedKeys) > 0 {
-			fmt.Print("The following keys are unused:\n\n")
-			for _, key := range unusedKeys {
-				fmt.Println(key)
+		if removeUnused {
+			if err := internal.CleanAndSortStringsFiles(stringsPath, stringsReferencePath, swiftDirectory, ignorePatterns, false); err != nil {
+				return fmt.Errorf("error cleaning .strings files: %w", err)
 			}
-			fmt.Printf("\nFound %d unused keys.\n", len(unusedKeys))
 		} else {
-			fmt.Println("No unused keys found.")
+			unusedKeys, err := internal.FindUnusedKeys(stringsReferencePath, swiftDirectory, ignorePatterns)
+			s.Stop()
+			if err != nil {
+				return fmt.Errorf("error finding unused keys: %v", err)
+			}
+
+			if len(unusedKeys) > 0 {
+				fmt.Print("The following keys are unused:\n\n")
+				for _, key := range unusedKeys {
+					fmt.Println(key)
+				}
+				fmt.Printf("\nFound %d unused keys.\n", len(unusedKeys))
+			} else {
+				fmt.Println("No unused keys found.")
+			}
 		}
 
 		return nil
@@ -55,8 +63,10 @@ var findCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(findCmd)
-	findCmd.Flags().StringVarP(&stringsReferencePath, "reference", "r", "", "Path to the Localizable.strings file which is used as reference for finding unused keys (required)")
-	findCmd.Flags().StringVarP(&swiftDirectory, "swift-dir", "d", "", "Path to the directory containing Swift files (.)")
-	findCmd.Flags().StringSliceVarP(&ignorePatterns, "ignore", "i", []string{}, "Glob patterns for files or directories to ignore")
+	rootCmd.AddCommand(unusedCmd)
+	unusedCmd.Flags().StringVar(&stringsPath, "strings", "", "Path to the directory containing the Localizable.string files (.)")
+	unusedCmd.Flags().StringVarP(&stringsReferencePath, "reference", "r", "", "Path to the Localizable.strings file which is used as reference for finding unused keys (required)")
+	unusedCmd.Flags().StringVarP(&swiftDirectory, "swift-dir", "d", "", "Path to the directory containing Swift files (.)")
+	unusedCmd.Flags().StringSliceVarP(&ignorePatterns, "ignore", "i", []string{}, "Glob patterns for files or directories to ignore")
+	unusedCmd.Flags().BoolVar(&removeUnused, "remove", false, "Remove unused keys from the .strings file")
 }

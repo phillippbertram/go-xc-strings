@@ -33,6 +33,19 @@ in the specified directory and subdirectories, removes them, and also sorts the 
 			stringsPath = "."
 		}
 
+		// lang, err := internal.FindDefaultLanguageForXcodeProject(".")
+		// if err != nil {
+		// 	return fmt.Errorf("error finding default language for Xcode project: %w", err)
+		// }
+		// fmt.Printf("Default language for Xcode project: %s\n", lang)
+
+		// strings, err := internal.GetLocalizableStringsPath(".", lang)
+		// if err != nil {
+		// 	return fmt.Errorf("error finding Localizable.strings file: %w", err)
+		// }
+		// fmt.Printf("Found Localizable.strings file: %s\n", strings)
+		// return nil
+
 		if stringsReferencePath == "" {
 			return fmt.Errorf("please specify the path to the .strings file and the directory containing Swift files")
 		}

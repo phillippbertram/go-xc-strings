@@ -10,13 +10,26 @@ import (
 )
 
 // RemoveKeyFromAllStringsFiles removes a specific key from all .strings files within a directory.
-func RemoveKeyFromAllStringsFiles(key, directory string) ([]string, error) {
+func RemoveKeyFromAllStringsFiles(key, directory string, excludeLanguages []string) ([]string, error) {
 	var removedFromFiles []string
 	err := filepath.Walk(directory, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 		if !info.IsDir() && strings.HasSuffix(info.Name(), ".strings") {
+
+			// Skip files that are in the excludeLanguages list
+			// Check if parent directory is in the following format: "<language>.lproj"
+			// if it is, ignore the file
+
+			// Check if the parent directory is in the format "<language>.lproj"
+			parentDir := filepath.Base(filepath.Dir(path))
+			for _, lang := range excludeLanguages {
+				if parentDir == fmt.Sprintf("%s.lproj", lang) {
+					return nil
+				}
+			}
+
 			wasRemoved, err := removeKeyFromFile(key, path)
 			if err != nil {
 				return err

@@ -28,7 +28,7 @@ var removeCmd = &cobra.Command{
 		key := args[0]
 		directory := args[1]
 
-		fileNames, err := internal.RemoveKeyFromAllStringsFiles(key, directory)
+		fileNames, err := internal.RemoveKeyFromAllStringsFiles(key, directory, excludeLanguages)
 		if err != nil {
 			return fmt.Errorf("failed to remove key: %w", err)
 		}
