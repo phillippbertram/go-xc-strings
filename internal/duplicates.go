@@ -2,75 +2,69 @@ package internal
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-// FindDuplicates searches for duplicate keys in a given .strings file or directory.
-// FindDuplicates searches for duplicate keys and their values in a given .strings file or directory.
 func FindDuplicates(path string) (DuplicatesMap, error) {
 	result := make(DuplicatesMap)
-	fileInfo, err := os.Stat(path)
-	if err != nil {
-		return nil, err
-	}
-
-	processFunc := func(path string) error {
-		duplicates, err := processFileForDuplicates(path)
+	err := filepath.Walk(path, func(filePath string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-		if len(duplicates) > 0 {
-			result[path] = duplicates
-		}
-		return nil
-	}
-
-	if fileInfo.IsDir() {
-		err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() && strings.HasSuffix(info.Name(), ".strings") {
+			duplicates, err := processFileForDuplicates(filePath)
 			if err != nil {
 				return err
 			}
-			if !info.IsDir() && strings.HasSuffix(info.Name(), ".strings") {
-				return processFunc(path)
+			if len(duplicates) > 0 {
+				result[filePath] = duplicates
 			}
-			return nil
-		})
-		if err != nil {
-			return nil, err
 		}
-	} else {
-		err := processFunc(path)
-		if err != nil {
-			return nil, err
-		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
 	return result, nil
 }
 
-func processFileForDuplicates(filePath string) (map[string]string, error) {
+func processFileForDuplicates(filePath string) (map[string][]string, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
 
-	keys := make(map[string]string)
-	duplicates := make(map[string]string)
 	scanner := bufio.NewScanner(file)
-
+	keys := make(map[string][]string)
 	for scanner.Scan() {
 		line := scanner.Text()
 		key, value := extractKeyValue(line)
 		if key != "" {
-			if _, found := keys[key]; found {
-				duplicates[key] = value // Store duplicate with its value
-			} else {
-				keys[key] = value
+			keys[key] = append(keys[key], value)
+		}
+	}
+
+	duplicates := make(map[string][]string)
+	for key, values := range keys {
+		if len(values) > 1 {
+			seen := make(map[string]bool)
+			var uniqueValues []string
+			for _, value := range values {
+				if _, found := seen[value]; !found {
+					seen[value] = true
+					uniqueValues = append(uniqueValues, value)
+				}
+			}
+			if len(uniqueValues) > 1 {
+				duplicates[key] = uniqueValues
 			}
 		}
 	}
+
 	if err := scanner.Err(); err != nil {
 		return nil, err
 	}
@@ -79,37 +73,44 @@ func processFileForDuplicates(filePath string) (map[string]string, error) {
 
 // RemoveDuplicates removes all but the first occurrence of each duplicate key.
 func RemoveDuplicates(basePath string, duplicates DuplicatesMap) error {
-	for filePath, dupKeys := range duplicates {
-		if err := removeExtraOccurrences(filePath, dupKeys); err != nil {
-			return err
+	for filePath, keys := range duplicates {
+		if err := removeExtraOccurrences(filePath, keys); err != nil {
+			return fmt.Errorf("failed to remove duplicates from %s: %w", filePath, err)
 		}
 	}
 	return nil
 }
 
-func removeExtraOccurrences(filePath string, dupKeys map[string]string) error {
-	file, err := os.Open(filePath)
+func removeExtraOccurrences(filePath string, dupKeys map[string][]string) error {
+	input, err := os.Open(filePath)
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer input.Close()
 
 	var lines []string
-	keysEncountered := make(map[string]bool)
-	scanner := bufio.NewScanner(file)
+	encounteredKeys := make(map[string]bool)
+
+	scanner := bufio.NewScanner(input)
 	for scanner.Scan() {
 		line := scanner.Text()
-		key, _ := extractKeyValue(line)
-		if _, found := dupKeys[key]; found && keysEncountered[key] {
-			continue // skip this line because it's a duplicate
+		key, value := extractKeyValue(line)
+		if dupValues, found := dupKeys[key]; found {
+			// Check if this value is the first occurrence and not already added.
+			if !encounteredKeys[key] && len(dupValues) > 0 && value == dupValues[0] {
+				lines = append(lines, line)
+				encounteredKeys[key] = true // Mark this key as added.
+			}
+		} else {
+			// Key is not a duplicate; add it to the output.
+			lines = append(lines, line)
 		}
-		lines = append(lines, line)
-		keysEncountered[key] = true
 	}
 
 	if err := scanner.Err(); err != nil {
 		return err
 	}
 
+	// Rewrite the file with duplicates removed.
 	return os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
 }

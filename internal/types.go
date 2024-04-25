@@ -5,4 +5,4 @@ type Entry struct {
 	value string
 }
 
-type DuplicatesMap map[string]map[string]string
+type DuplicatesMap map[string]map[string][]string

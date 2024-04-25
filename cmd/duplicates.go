@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"phillipp.io/go-xc-strings/internal"
@@ -52,9 +53,10 @@ var duplicatesCmd = &cobra.Command{
 			}
 			for file, keys := range duplicates {
 				fmt.Printf("Duplicates in %s:\n", file)
-				for key, value := range keys {
-					fmt.Printf("%s = %s\n", key, value)
+				for key, values := range keys {
+					fmt.Printf("%s: %s\n", key, strings.Join(values, ", "))
 				}
+				fmt.Println()
 			}
 		}
 
