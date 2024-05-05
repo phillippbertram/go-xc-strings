@@ -32,6 +32,7 @@ func FindDuplicates(path string) (DuplicatesMap, error) {
 }
 
 func processFileForDuplicates(filePath string) (map[string][]string, error) {
+	fmt.Printf("Processing %s\n", filePath)
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
@@ -48,20 +49,11 @@ func processFileForDuplicates(filePath string) (map[string][]string, error) {
 		}
 	}
 
+	// find duplicates where the key has more than one value
 	duplicates := make(map[string][]string)
 	for key, values := range keys {
 		if len(values) > 1 {
-			seen := make(map[string]bool)
-			var uniqueValues []string
-			for _, value := range values {
-				if _, found := seen[value]; !found {
-					seen[value] = true
-					uniqueValues = append(uniqueValues, value)
-				}
-			}
-			if len(uniqueValues) > 1 {
-				duplicates[key] = uniqueValues
-			}
+			duplicates[key] = values
 		}
 	}
 

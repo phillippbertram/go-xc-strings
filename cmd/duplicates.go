@@ -10,6 +10,9 @@ import (
 	"phillipp.io/go-xc-strings/internal"
 )
 
+// Script to find duplicate keys in .strings files
+// for f in <PATH>/*.lproj/Localizable.strings; do echo "$f:"; sed '/^$/d' "$f" | sort | uniq -cd; echo; done
+
 var removeDuplicates bool
 
 var duplicatesCmd = &cobra.Command{
