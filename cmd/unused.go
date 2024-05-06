@@ -14,13 +14,13 @@ import (
 var removeUnused bool
 
 var unusedCmd = &cobra.Command{
-	Use:   "unused -r <Localizable.strings> [-d <path to swift code>] [-i <ignore pattern>...]",
+	Use:   "unused -b <Localizable.strings> [-d <path to swift code>] [-i <ignore pattern>...]",
 	Short: "Finds unused keys in .strings files",
 	Long: heredoc.Doc(
 		`Check for localization keys defined in a .strings file that are not used in any Swift file within a specified directory.`),
 	Example: heredoc.Doc(`
-		unused -r Localizable.strings
-		unused -r Localizable.strings -d Sources/MyApp -i "Pods/*" "Carthage/*" "*.generated.swift"
+		unused -b Localizable.strings
+		unused -b Localizable.strings -d Sources/MyApp -i "Pods/*" "Carthage/*" "*.generated.swift"
 	`),
 	Args: cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -65,7 +65,7 @@ var unusedCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(unusedCmd)
 	unusedCmd.Flags().StringVar(&stringsPath, "strings", "", "Path to the directory containing the Localizable.string files (.)")
-	unusedCmd.Flags().StringVarP(&stringsReferencePath, "reference", "r", "", "Path to the Localizable.strings file which is used as reference for finding unused keys (required)")
+	unusedCmd.Flags().StringVarP(&stringsReferencePath, "base", "b", "", "Path to the base Localizable.strings file which is used as reference for finding unused keys (required)")
 	unusedCmd.Flags().StringVarP(&swiftDirectory, "swift-dir", "d", "", "Path to the directory containing Swift files (.)")
 	unusedCmd.Flags().StringSliceVarP(&ignorePatterns, "ignore", "i", []string{}, "Glob patterns for files or directories to ignore")
 	unusedCmd.Flags().BoolVar(&removeUnused, "remove", false, "Remove unused keys from the .strings file")

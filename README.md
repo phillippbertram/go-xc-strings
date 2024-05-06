@@ -9,39 +9,6 @@ It provides functionalities to find unused localization keys, clean them from `.
 - **Clean `.strings` Files**: Removes unused keys from `.strings` files.
 - **Sort `.strings` Files**: Optionally sorts keys in `.strings` files to maintain a consistent order.
 
-### Sorting `.strings` Files
-
-`Localizable.strings` before
-```text
-"welcome_screen_title"= "Hello";
-
-"settings_screen_title" ="Settings";
-"settings_screen_logout_button_title" ="logout";
-
-"settings_screen_theme_light"="Light";
-
-"general_dialog_ok"="OK";
-"settings_screen_theme_dark"="Dark";
-```
-
-Sorting the `.strings` file:
-```bash
-$ xc-strings sort Localizable.strings
-```
-
-`Localizable.strings` after sorting
-```text
-"general_dialog_ok"="OK";
-
-"settings_screen_logout_button_title"="logout";
-"settings_screen_theme_dark"="Dark";
-"settings_screen_theme_light"="Light";
-"settings_screen_title"="Settings";
-
-"welcome_screen_title"="Hello";
-```
-
-
 ## Installation
 
 ### Prerequisites
@@ -55,43 +22,32 @@ Clone the repository and build the executable:
 ```bash
 git clone git@github.com:phillippbertram/go-xc-strings.git
 cd go-xc-strings
-go build -o xc-strings
+make build
+./bin/xc-strings help
 ```
 
 ## Usage
 
-### Finding Unused Keys
-
-To find and report unused localization keys:
-
 ```bash
-./xc-strings find -r path/to/Localizable.strings -d path/to/swift/files
-```
 
-### Cleaning `.strings` Files
+# get help and list all available commands
+xc-strings help
 
-To remove unused keys from `.strings` files:
+# list unused localization keys
+# -b: path to the base localization file
+# -d: optional path to the directory containing the Swift files
+# --strings: path to the directory containing the .strings files
+# -i: optional glob pattern to exclude files
+xc-strings unused -b path/to/Localizable.strings -d path/to/swift/files --strings App/Resources -i "*.generated.swift"
 
-```bash
-./xc-strings clean /path/to/project --sort
-```
+# sort strings files
+xc-strings sort App/Resources
 
-This command will remove unused keys and sort the `.strings` files if the `--sort` flag is provided.
+# remove keys from all strings files that are not used in the Swift files
+xc-strings remove "this_is_a_key" AppIOS/Resources
 
-### Dry-Run Mode
-
-To simulate changes without making actual modifications:
-
-```bash
-./xc-strings clean /path/to/project --dry-run
-```
-
-### Sorting `.strings` Files
-
-To sort `.strings` files without removing keys:
-
-```bash
-./xc-strings sort /path/to/strings/files
+# clean: aggregated command to remove unused keys and sort the strings files
+xc-strings clean -b path/to/Localizable.strings -d path/to/swift/files --strings App/Resources -i "*.generated.swift"
 ```
 
 ## Configuration
