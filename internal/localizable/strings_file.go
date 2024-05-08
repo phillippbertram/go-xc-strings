@@ -26,6 +26,7 @@ type StringsFile struct {
 	Lines []Line
 }
 
+// NewStringsFile creates a new StringsFile instance
 func NewStringsFile(path string) (*StringsFile, error) {
 	str := &StringsFile{
 		Path:  path,
@@ -36,6 +37,7 @@ func NewStringsFile(path string) (*StringsFile, error) {
 	return str, err
 }
 
+// parse reads the file and parses it into lines
 func (sf *StringsFile) parse() error {
 	file, err := os.Open(sf.Path)
 	if err != nil {
@@ -69,6 +71,7 @@ func (sf *StringsFile) parse() error {
 	return scanner.Err()
 }
 
+// GetLinesForKey returns all lines with the specified key
 func (sf *StringsFile) GetLinesForKey(key string) []Line {
 	var linesForKey []Line
 
@@ -82,6 +85,7 @@ func (sf *StringsFile) GetLinesForKey(key string) []Line {
 	return linesForKey
 }
 
+// FindDuplicateKeys returns a map of duplicate keys and their lines
 func (sf *StringsFile) FindDuplicateKeys() map[string][]Line {
 	keyLines := make(map[string][]Line)
 	duplicates := make(map[string][]Line)
@@ -105,6 +109,7 @@ func (sf *StringsFile) FindDuplicateKeys() map[string][]Line {
 	return duplicates
 }
 
+// RemoveKey removes all lines with the specified key and returns them
 func (sf *StringsFile) RemoveKey(key string) []Line {
 	var removedLines []Line
 	var newLines []Line
@@ -180,6 +185,7 @@ func (sf *StringsFile) RemoveDuplicatesKeepLast() {
 	sf.Lines = newLines
 }
 
+// IsSorted checks if the file is sorted by key
 func (sf *StringsFile) IsSorted() bool {
 	var lastKey string // Initialize the lastKey as an empty string to start comparison
 
@@ -195,6 +201,32 @@ func (sf *StringsFile) IsSorted() bool {
 	return true // If all keys are in order or there are no keys, the file is sorted
 }
 
+// Sanitize trims leading and trailing white spaces from the entire line and ensures key-value pairs are formatted correctly
+func (sf *StringsFile) Sanitize() {
+	for i, line := range sf.Lines {
+		// Trim leading and trailing white spaces from the entire line
+		trimmedLine := strings.TrimSpace(line.Text)
+
+		// for each key-value pair
+		if line.Key != "" && strings.Contains(trimmedLine, "=") { // This is a key-value pair
+			// Split around the '=' sign and remove all extra spaces around keys and values
+			parts := strings.SplitN(trimmedLine, "=", 2)
+			if len(parts) == 2 {
+				key := strings.TrimSpace(parts[0])
+				value := strings.TrimSpace(parts[1])
+
+				// Ensure value is trimmed of semicolons and extra spaces, then add one semicolon back
+				value = strings.TrimRight(value, ";")
+				trimmedLine = key + "=" + value + ";" // Reformat the line properly
+			}
+		}
+
+		// Update the line in the slice
+		sf.Lines[i].Text = trimmedLine
+	}
+}
+
+// Save writes the StringsFile back to the file
 func (sf *StringsFile) Save() error {
 	file, err := os.Create(sf.Path)
 	if err != nil {
@@ -212,6 +244,7 @@ func (sf *StringsFile) Save() error {
 	return writer.Flush()
 }
 
+// FileInfo returns a summary of the file
 func (sf *StringsFile) FileInfo() FileInfoSummary {
 	keyCount := make(map[string]int)
 	var lastKey string
