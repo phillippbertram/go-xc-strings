@@ -156,8 +156,9 @@ func (sf *StringsFile) Sort() {
 	sf.Lines = sortedLines
 }
 
-func (sf *StringsFile) RemoveDuplicatesKeepLast() {
+func (sf *StringsFile) RemoveDuplicatesKeepLast() []Line {
 	lastOccurrence := make(map[string]int) // Map to store the index of the last occurrence of each key
+	removedLines := make([]Line, 0)
 
 	// Track the last occurrence of each key
 	for i, line := range sf.Lines {
@@ -174,6 +175,8 @@ func (sf *StringsFile) RemoveDuplicatesKeepLast() {
 		if line.Key != "" {
 			if lastIndex, ok := lastOccurrence[line.Key]; ok && lastIndex == index {
 				newLines = append(newLines, line)
+			} else {
+				removedLines = append(removedLines, line)
 			}
 		} else {
 			// Preserve lines without keys (like comments and empty lines)
@@ -183,6 +186,7 @@ func (sf *StringsFile) RemoveDuplicatesKeepLast() {
 
 	// Update the Lines slice
 	sf.Lines = newLines
+	return removedLines
 }
 
 // IsSorted checks if the file is sorted by key
