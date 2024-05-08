@@ -73,7 +73,7 @@ func init() {
 	rootCmd.AddCommand(cleanCmd)
 	cleanCmd.Flags().StringVarP(&stringsReferencePath, "base", "b", "", "Path to the base Localizable.strings file which is used as reference for finding unused keys (required)")
 	cleanCmd.Flags().StringVarP(&swiftDirectory, "swift-dir", "d", "", "Path to the directory containing Swift files (.)")
-	cleanCmd.Flags().StringVar(&stringsPath, "strings", "", "Path to the directory containing the Localizable.string files (.)")
+	cleanCmd.Flags().StringVar(&stringsPath, "strings", "p", "Path to the directory containing the Localizable.string files (.)")
 	cleanCmd.Flags().StringSliceVarP(&ignorePatterns, "ignore", "i", []string{}, "Glob patterns for files or directories to ignore")
 	cleanCmd.Flags().BoolVarP(&skipSort, "skip-sort", "s", false, "Skip sort the .strings files")
 	// TODO: cleanCmd.Flags().BoolVar(&dryRun, "dry-run", false, "Simulate the changes without applying them")

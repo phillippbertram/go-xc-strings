@@ -11,36 +11,37 @@ import (
 var excludeLanguages []string
 
 var removeCmd = &cobra.Command{
-	Use:   "remove [key] [directory]",
+	Use:   "remove [key] -p [directory]",
 	Short: "Removes a localization key from all .strings files",
 	Example: heredoc.Doc(`
-	    # removes the key "key_name" from all .strings files 
+	    # removes the key "key_name" from all .strings files recursively in the current directory
 		remove "key_name"
 
 		# removes the key "key_name" from all .strings files in the specified directory
-		remove "key_name" -d path/to/directory
+		remove "key_name" -p path/to/directory
 
-		# removes the key "key_name" from the specified .strings file
-		remove "key_name" path/to/Localizable.strings
+		# removes multiple the keys from the specified .strings file
+		remove "key_name" "key_name2" "key_name_3" -p path/to/Localizable.strings
 	`),
-	Args: cobra.ExactArgs(2),
+	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		key := args[0]
-		directory := args[1]
+		keys := args
 
-		fileNames, err := internal.RemoveKeyFromAllStringsFiles(key, directory, excludeLanguages)
-		if err != nil {
-			return fmt.Errorf("failed to remove key: %w", err)
-		}
+		for _, key := range keys {
+			fileNames, err := internal.RemoveKeyFromAllStringsFiles(key, stringsPath, excludeLanguages)
+			if err != nil {
+				return fmt.Errorf("failed to remove key: %w", err)
+			}
 
-		if len(fileNames) == 0 {
-			fmt.Println("Key not found in any .strings files")
-			return nil
-		}
+			if len(fileNames) == 0 {
+				fmt.Println("Key not found in any .strings files")
+				return nil
+			}
 
-		fmt.Printf("Key removed successfully from the following %d files:\n", len(fileNames))
-		for _, fileName := range fileNames {
-			fmt.Println(fileName)
+			fmt.Printf("Key [%s] removed successfully from the following %d files:\n", key, len(fileNames))
+			for _, fileName := range fileNames {
+				fmt.Println(fileName)
+			}
 		}
 		return nil
 	},
@@ -50,4 +51,5 @@ func init() {
 	rootCmd.AddCommand(removeCmd)
 
 	removeCmd.Flags().StringArrayVarP(&excludeLanguages, "exclude", "e", []string{}, "Exclude languages from the operation")
+	removeCmd.Flags().StringVarP(&stringsPath, "strings", "p", ".", "Path to the directory containing the .strings files")
 }
