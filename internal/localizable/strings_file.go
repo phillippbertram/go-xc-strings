@@ -14,6 +14,13 @@ type Line struct {
 	LineNumber int    // Line number in the file
 }
 
+type FileInfoSummary struct {
+	FilePath       string
+	TotalKeys      int
+	DuplicateCount int
+	NeedsSorting   bool
+}
+
 type StringsFile struct {
 	Path  string
 	Lines []Line
@@ -144,6 +151,50 @@ func (sf *StringsFile) Sort() {
 	sf.Lines = sortedLines
 }
 
+func (sf *StringsFile) RemoveDuplicatesKeepLast() {
+	lastOccurrence := make(map[string]int) // Map to store the index of the last occurrence of each key
+
+	// Track the last occurrence of each key
+	for i, line := range sf.Lines {
+		if line.Key != "" { // Only consider lines with keys
+			lastOccurrence[line.Key] = i
+		}
+	}
+
+	// Create a new slice for lines, reserving space
+	newLines := make([]Line, 0, len(lastOccurrence))
+
+	// Used to check if the index is the last occurrence
+	for index, line := range sf.Lines {
+		if line.Key != "" {
+			if lastIndex, ok := lastOccurrence[line.Key]; ok && lastIndex == index {
+				newLines = append(newLines, line)
+			}
+		} else {
+			// Preserve lines without keys (like comments and empty lines)
+			newLines = append(newLines, line)
+		}
+	}
+
+	// Update the Lines slice
+	sf.Lines = newLines
+}
+
+func (sf *StringsFile) IsSorted() bool {
+	var lastKey string // Initialize the lastKey as an empty string to start comparison
+
+	for _, line := range sf.Lines {
+		if line.Key != "" { // Only consider lines with keys
+			if lastKey != "" && lastKey > line.Key {
+				return false // If any key is greater than the next key, the file is not sorted
+			}
+			lastKey = line.Key // Update lastKey to the current key after comparison
+		}
+	}
+
+	return true // If all keys are in order or there are no keys, the file is sorted
+}
+
 func (sf *StringsFile) Save() error {
 	file, err := os.Create(sf.Path)
 	if err != nil {
@@ -159,4 +210,39 @@ func (sf *StringsFile) Save() error {
 	}
 
 	return writer.Flush()
+}
+
+func (sf *StringsFile) FileInfo() FileInfoSummary {
+	keyCount := make(map[string]int)
+	var lastKey string
+	needsSorting := false
+
+	// Determine unique keys, duplicates, and sort necessity
+	for _, line := range sf.Lines {
+		if line.Key != "" {
+			keyCount[line.Key]++
+
+			// Check sorting: if lastKey is greater than the current key, file needs sorting
+			if lastKey != "" && lastKey > line.Key {
+				needsSorting = true
+			}
+			lastKey = line.Key
+		}
+	}
+
+	// Calculate the total number of keys and duplicates
+	totalKeys := len(keyCount)
+	duplicateCount := 0
+	for _, count := range keyCount {
+		if count > 1 {
+			duplicateCount++
+		}
+	}
+
+	return FileInfoSummary{
+		FilePath:       sf.Path,
+		TotalKeys:      totalKeys,
+		DuplicateCount: duplicateCount,
+		NeedsSorting:   needsSorting,
+	}
 }
