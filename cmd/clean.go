@@ -2,18 +2,12 @@ package cmd
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/MakeNowJust/heredoc"
-	"github.com/briandowns/spinner"
 	"github.com/spf13/cobra"
-	"phillipp.io/go-xc-strings/internal"
 )
 
-var skipSort bool
-var stringsPath string
-
-// TODO: var dryRun bool
+// TODO: implement
 
 var cleanCmd = &cobra.Command{
 	Use:   "clean",
@@ -26,55 +20,11 @@ in the specified directory and subdirectories, removes them, and also sorts the 
 	`),
 	Args: cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if swiftDirectory == "" {
-			swiftDirectory = "."
-		}
-		if stringsPath == "" {
-			stringsPath = "."
-		}
-
-		// lang, err := internal.FindDefaultLanguageForXcodeProject(".")
-		// if err != nil {
-		// 	return fmt.Errorf("error finding default language for Xcode project: %w", err)
-		// }
-		// fmt.Printf("Default language for Xcode project: %s\n", lang)
-
-		// strings, err := internal.GetLocalizableStringsPath(".", lang)
-		// if err != nil {
-		// 	return fmt.Errorf("error finding Localizable.strings file: %w", err)
-		// }
-		// fmt.Printf("Found Localizable.strings file: %s\n", strings)
-		// return nil
-
-		if stringsReferencePath == "" {
-			return fmt.Errorf("please specify the path to the .strings file and the directory containing Swift files")
-		}
-
-		// if dryRun {
-		// 	fmt.Println("Running in dry-run mode. No changes will be made.")
-		// }
-
-		// Start a spinner
-		s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
-		s.Suffix = " Searching for unused keys..."
-		s.Start()
-
-		// Clean and optionally sort the .strings files
-		if err := internal.CleanAndSortStringsFiles(stringsPath, stringsReferencePath, swiftDirectory, ignorePatterns, !skipSort); err != nil {
-			return fmt.Errorf("error cleaning .strings files: %w", err)
-		}
-
-		fmt.Println("Cleaning and sorting completed successfully.")
-		return nil
+		return fmt.Errorf("not implemented 😱")
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(cleanCmd)
-	cleanCmd.Flags().StringVarP(&stringsReferencePath, "base", "b", "", "Path to the base Localizable.strings file which is used as reference for finding unused keys (required)")
-	cleanCmd.Flags().StringVarP(&swiftDirectory, "swift-dir", "d", "", "Path to the directory containing Swift files (.)")
-	cleanCmd.Flags().StringVar(&stringsPath, "strings", "p", "Path to the directory containing the Localizable.string files (.)")
-	cleanCmd.Flags().StringSliceVarP(&ignorePatterns, "ignore", "i", []string{}, "Glob patterns for files or directories to ignore")
-	cleanCmd.Flags().BoolVarP(&skipSort, "skip-sort", "s", false, "Skip sort the .strings files")
-	// TODO: cleanCmd.Flags().BoolVar(&dryRun, "dry-run", false, "Simulate the changes without applying them")
+
 }

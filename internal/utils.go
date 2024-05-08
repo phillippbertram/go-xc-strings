@@ -28,6 +28,15 @@ func SliceToMap(slice []string) map[string]struct{} {
 	return result
 }
 
+func MapToSlice(m map[string]struct{}) []string {
+	result := make([]string, 0, len(m))
+	for key := range m {
+		result = append(result, key)
+	}
+	return result
+
+}
+
 // IsDirectory determines if a file represented
 // by `path` is a directory or not
 func IsDirectory(path string) (bool, error) {

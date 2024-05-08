@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -8,37 +9,22 @@ import (
 	"strings"
 )
 
-// locates keys in the .strings file that are not referenced in Swift files.
-func FindUnusedKeys(referenceStringsPath, swiftDirectory string, ignorePatterns []string) ([]string, error) {
-	entries, err := parseStringsFile(referenceStringsPath)
-	if err != nil {
-		return nil, err
-	}
+func SearchKeysInSwiftFiles(directory string, keys []string, ignorePatterns []string) []string {
+	fmt.Println("Searching for keys in Swift files...")
+	fmt.Println("Directory:", directory)
+	fmt.Println("Keys:", len(keys))
+	fmt.Println("Ignore patterns: ", ignorePatterns)
 
-	keys := make(map[string]struct{})
-	for _, entry := range entries {
-		keys[entry.key] = struct{}{}
-	}
-
-	usedKeys := SearchKeysInSwiftFiles(swiftDirectory, keys, ignorePatterns)
-	unusedKeys := []string{}
-	for key := range keys {
-		if _, found := usedKeys[key]; !found {
-			unusedKeys = append(unusedKeys, key)
-		}
-	}
-	sort.Strings(unusedKeys)
-	return unusedKeys, nil
-}
-
-func SearchKeysInSwiftFiles(directory string, keys []string, ignorePatterns []string) map[string]struct{} {
 	keysMap := SliceToMap(keys) // more performant
-
 	usedKeys := make(map[string]struct{})
+	unusedKeys := make(map[string]struct{})
+
 	filepath.Walk(directory, func(path string, info fs.FileInfo, err error) error {
+
 		if err != nil {
 			return err
 		}
+		// fmt.Printf("Processing %s\n", path)
 
 		// Skip directories and files that match the ignore patterns
 		for _, pattern := range ignorePatterns {
@@ -67,5 +53,19 @@ func SearchKeysInSwiftFiles(directory string, keys []string, ignorePatterns []st
 		}
 		return nil
 	})
-	return usedKeys
+
+	// get unused keys
+	for key := range keysMap {
+		if _, ok := usedKeys[key]; !ok {
+			unusedKeys[key] = struct{}{}
+		}
+	}
+
+	// Map to slice
+	unusedKeysSlice := MapToSlice(unusedKeys)
+
+	// sort the slice
+	sort.Strings(unusedKeysSlice)
+
+	return unusedKeysSlice
 }
