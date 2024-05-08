@@ -71,6 +71,24 @@ func (sf *StringsFile) parse() error {
 	return scanner.Err()
 }
 
+func (sf *StringsFile) GetAllKeys() []string {
+	// only unique keys
+	keys := make(map[string]struct{})
+	for _, line := range sf.Lines {
+		if line.Key != "" {
+			keys[line.Key] = struct{}{}
+		}
+	}
+
+	// convert to slice
+	var keySlice []string
+	for key := range keys {
+		keySlice = append(keySlice, key)
+	}
+
+	return keySlice
+}
+
 // GetLinesForKey returns all lines with the specified key
 func (sf *StringsFile) GetLinesForKey(key string) []Line {
 	var linesForKey []Line

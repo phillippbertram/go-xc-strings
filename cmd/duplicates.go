@@ -6,6 +6,7 @@ import (
 	"github.com/MakeNowJust/heredoc"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
+	"phillipp.io/go-xc-strings/internal/constants"
 	"phillipp.io/go-xc-strings/internal/localizable"
 )
 
@@ -19,7 +20,7 @@ type DuplicatesOptions struct {
 }
 
 var duplicatesOptions DuplicatesOptions = DuplicatesOptions{
-	paths: []string{"*.strings"},
+	paths: []string{constants.DefaultStringsGlob},
 }
 
 var duplicatesCmd = &cobra.Command{

@@ -5,6 +5,7 @@ import (
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/spf13/cobra"
+	"phillipp.io/go-xc-strings/internal/constants"
 	"phillipp.io/go-xc-strings/internal/localizable"
 )
 
@@ -15,7 +16,7 @@ type SortOptions struct {
 }
 
 var sortOptions SortOptions = SortOptions{
-	paths: []string{"*.strings"},
+	paths: []string{constants.DefaultStringsGlob},
 }
 
 var sortCmd = &cobra.Command{

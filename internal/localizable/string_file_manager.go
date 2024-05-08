@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
@@ -30,6 +31,27 @@ func NewStringsFileManager(paths []string) (*StringsFileManager, error) {
 	}
 
 	return man, nil
+}
+
+func (m *StringsFileManager) GetAllKeys() []string {
+	keys := make(map[string]struct{})
+	for _, file := range m.Files {
+		for _, line := range file.Lines {
+			if line.Key != "" {
+				keys[line.Key] = struct{}{}
+			}
+		}
+	}
+
+	uniqueKeys := make([]string, 0, len(keys))
+	for key := range keys {
+		uniqueKeys = append(uniqueKeys, key)
+	}
+
+	// sort uniquekeys
+	sort.Strings(uniqueKeys)
+
+	return uniqueKeys
 }
 
 func (m *StringsFileManager) FindDuplicates() map[string]*DuplicateKeys {

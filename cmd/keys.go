@@ -4,7 +4,9 @@ import (
 	"fmt"
 
 	"github.com/MakeNowJust/heredoc"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
+	"phillipp.io/go-xc-strings/internal/constants"
 	"phillipp.io/go-xc-strings/internal/localizable"
 )
 
@@ -14,11 +16,11 @@ type KeysOptions struct {
 	removeKeys bool
 	dryRun     bool
 
-	excludeLanguages []string
+	// TODO: excludeLanguages []string
 }
 
 var keysOptions KeysOptions = KeysOptions{
-	path: "*.strings",
+	path: constants.DefaultStringsGlob,
 }
 
 var findKeysCmd = &cobra.Command{
@@ -36,11 +38,27 @@ var findKeysCmd = &cobra.Command{
 	`),
 	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		keysOptions.keys = args[:len(args)-1]
+
+		if len(args) > 1 {
+			keysOptions.keys = args[:len(args)-1]
+		}
+
+		// TODO: when no key is provided, return all available keys
+
 		keysOptions.path = args[len(args)-1]
 		manager, err := localizable.NewStringsFileManager([]string{keysOptions.path})
 		if err != nil {
 			return fmt.Errorf("error initializing strings manager: %w", err)
+		}
+
+		var keys []string
+		if len(keysOptions.keys) == 0 {
+			keys = manager.GetAllKeys()
+			for _, key := range keys {
+				fmt.Printf("%s\n", key)
+			}
+			color.Green("Found %d keys in %d files\n", len(keys), len(manager.Files))
+			return nil
 		}
 
 		for _, file := range manager.Files {

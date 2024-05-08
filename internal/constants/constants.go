@@ -1,4 +1,4 @@
-package internal
+package constants
 
 // TODO: not used yet
 var defaultExcludeDirs = []string{
@@ -9,3 +9,5 @@ var defaultExcludeDirs = []string{
 	"DerivedData",
 	".git",
 }
+
+var DefaultStringsGlob = "*.strings"
