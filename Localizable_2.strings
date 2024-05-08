@@ -1,0 +1,13 @@
+"welcome_screen_title"="Hello";
+
+"settings_screen_title"="Settings1";
+"settings_screen_theme_dark"=   "Dark";
+"general_dialog_ok" ="OK";
+
+"settings_screen_logout_button_title" ="logout";
+"settings_screen_theme_light"="Light";
+"settings_screen_title"="Setting2";
+
+"some_key_with_missing_semicolon" = "no semi"
+
+"welcome_screen_title"="Hello2";

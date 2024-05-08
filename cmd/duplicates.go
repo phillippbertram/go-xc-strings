@@ -2,18 +2,24 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
-	"phillipp.io/go-xc-strings/internal"
+	"phillipp.io/go-xc-strings/internal/localizable"
 )
 
 // Script to find duplicate keys in .strings files
 // for f in <PATH>/*.lproj/Localizable.strings; do echo "$f:"; sed '/^$/d' "$f" | sort | uniq -cd; echo; done
 
-var removeDuplicates bool
+type DuplicatesOptions struct {
+	paths            []string
+	removeDuplicates bool
+}
+
+var duplicatesOptions DuplicatesOptions = DuplicatesOptions{
+	paths: []string{"*.strings"},
+}
 
 var duplicatesCmd = &cobra.Command{
 	Use:   "duplicates [path]",
@@ -30,52 +36,38 @@ var duplicatesCmd = &cobra.Command{
 		duplicates --remove
 	`),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// Determine the path to sort
-		var path string
-		if len(args) == 0 {
-			// If no argument is provided, use the current directory
-			var err error
-			wd, err := os.Getwd()
-			if err != nil {
-				return fmt.Errorf("error getting current directory: %w", err)
-			}
-			path = wd
-
-		} else {
-			path = args[0]
+		if len(args) != 0 {
+			sortOptions.paths = args
 		}
 
-		duplicates, err := internal.FindDuplicates(path)
+		manager, err := localizable.NewStringsFileManager(sortOptions.paths)
 		if err != nil {
-			return err
+			return fmt.Errorf("error initializing strings manager: %w", err)
 		}
+
+		duplicates := manager.FindDuplicates()
 		if len(duplicates) == 0 {
 			color.Green("No duplicate keys found.")
 			return nil
 		}
 
-		fileColor := color.New(color.FgCyan, color.Bold)
-		keyColor := color.New(color.FgYellow)
-		valueColor := color.New(color.FgGreen)
+		// fileColor := color.New(color.FgCyan, color.Bold)
+		// keyColor := color.New(color.FgYellow)
+		// valueColor := color.New(color.FgGreen)
 
-		if removeDuplicates {
-			err = internal.RemoveDuplicatesKeepLast(path, duplicates)
-			if err != nil {
-				return fmt.Errorf("failed to remove duplicates: %w", err)
-			}
-			color.Green("Duplicates removed successfully.")
-		} else {
+		for file, dup := range duplicates {
+			fmt.Printf("Duplicates in %s:\n", file)
+			for key, l := range dup.Duplicates {
+				fmt.Printf("%d - %s\n", len(l), key)
 
-			for file, keys := range duplicates {
-				fileColor.Printf("Duplicates in %s:\n", file)
-				for key, values := range keys {
-					keyColor.Printf("%s:\n", key)
-					for _, value := range values {
-						valueColor.Printf("-> %s\n ", value)
-					}
-				}
-				fmt.Println()
+				// TODO: print the lines if wanted?
 			}
+			fmt.Println()
+		}
+
+		if duplicatesOptions.removeDuplicates {
+			// remove all but the last occurrence of each duplicate key
+			return fmt.Errorf("removing duplicates is not yet implemented 😭")
 		}
 
 		return nil
@@ -84,5 +76,5 @@ var duplicatesCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(duplicatesCmd)
-	duplicatesCmd.Flags().BoolVar(&removeDuplicates, "remove", false, "Remove all but the last occurrence of each duplicate key")
+	duplicatesCmd.Flags().BoolVar(&duplicatesOptions.removeDuplicates, "remove", false, "Remove all but the last occurrence of each duplicate key")
 }

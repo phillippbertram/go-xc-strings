@@ -37,7 +37,6 @@ var sortCmd = &cobra.Command{
 		sort path1/Localizable.strings path2/InfoPlist.strings
 	`),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// Determine the path to sort
 
 		if len(args) != 0 {
 			sortOptions.paths = args
