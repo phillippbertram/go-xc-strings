@@ -15,6 +15,7 @@ import (
 type DuplicatesOptions struct {
 	paths            []string
 	removeDuplicates bool
+	dryRun           bool
 }
 
 var duplicatesOptions DuplicatesOptions = DuplicatesOptions{
@@ -51,10 +52,6 @@ var duplicatesCmd = &cobra.Command{
 			return nil
 		}
 
-		// fileColor := color.New(color.FgCyan, color.Bold)
-		// keyColor := color.New(color.FgYellow)
-		// valueColor := color.New(color.FgGreen)
-
 		for file, dup := range duplicates {
 			fmt.Printf("Duplicates in %s:\n", file)
 			for key, l := range dup.Duplicates {
@@ -67,7 +64,20 @@ var duplicatesCmd = &cobra.Command{
 
 		if duplicatesOptions.removeDuplicates {
 			// remove all but the last occurrence of each duplicate key
-			return fmt.Errorf("removing duplicates is not yet implemented 😭")
+			for _, file := range manager.Files {
+				removedLines := file.RemoveDuplicatesKeepLast()
+				fmt.Printf("Removed %d duplicates in %s\n", len(removedLines), file.Path)
+
+				if !duplicatesOptions.dryRun {
+					file.Save()
+				}
+			}
+		}
+
+		if duplicatesOptions.dryRun {
+			color.Yellow("Dry-run completed. No changes were made.")
+		} else {
+			color.Green("All duplicates removed successfully.")
 		}
 
 		return nil
@@ -77,4 +87,5 @@ var duplicatesCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(duplicatesCmd)
 	duplicatesCmd.Flags().BoolVar(&duplicatesOptions.removeDuplicates, "remove", false, "Remove all but the last occurrence of each duplicate key")
+	duplicatesCmd.Flags().BoolVar(&duplicatesOptions.dryRun, "dry-run", false, "Prints the changes without writing them to the file")
 }
