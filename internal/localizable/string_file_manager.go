@@ -43,6 +43,30 @@ func (m *StringsFileManager) GetAllKeys() []string {
 		}
 	}
 
+	// TODO: duplicate with GetKeysForFile
+	uniqueKeys := make([]string, 0, len(keys))
+	for key := range keys {
+		uniqueKeys = append(uniqueKeys, key)
+	}
+
+	// sort uniquekeys
+	sort.Strings(uniqueKeys)
+
+	return uniqueKeys
+}
+func (m *StringsFileManager) GetKeysForFile(file string) []string {
+	keys := make(map[string]struct{})
+	for _, f := range m.Files {
+		if f.Path == file {
+			for _, line := range f.Lines {
+				if line.Key != "" {
+					keys[line.Key] = struct{}{}
+				}
+			}
+		}
+	}
+
+	// TODO: duplicate with GetAllKeys
 	uniqueKeys := make([]string, 0, len(keys))
 	for key := range keys {
 		uniqueKeys = append(uniqueKeys, key)

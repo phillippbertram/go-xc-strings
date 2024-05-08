@@ -1,13 +1,13 @@
 package constants
 
-// TODO: not used yet
-var defaultExcludeDirs = []string{
+var DefaultIgnorePatterns = []string{
 	"Pods",
 	"Carthage",
 	"build",
 	".build",
 	"DerivedData",
 	".git",
+	"*.generated.swift",
 }
 
 var DefaultStringsGlob = "*.strings"

@@ -20,7 +20,7 @@ func FindUnusedKeys(referenceStringsPath, swiftDirectory string, ignorePatterns 
 		keys[entry.key] = struct{}{}
 	}
 
-	usedKeys := searchKeysInSwiftFiles(swiftDirectory, keys, ignorePatterns)
+	usedKeys := SearchKeysInSwiftFiles(swiftDirectory, keys, ignorePatterns)
 	unusedKeys := []string{}
 	for key := range keys {
 		if _, found := usedKeys[key]; !found {
@@ -31,7 +31,9 @@ func FindUnusedKeys(referenceStringsPath, swiftDirectory string, ignorePatterns 
 	return unusedKeys, nil
 }
 
-func searchKeysInSwiftFiles(directory string, keys map[string]struct{}, ignorePatterns []string) map[string]struct{} {
+func SearchKeysInSwiftFiles(directory string, keys []string, ignorePatterns []string) map[string]struct{} {
+	keysMap := SliceToMap(keys) // more performant
+
 	usedKeys := make(map[string]struct{})
 	filepath.Walk(directory, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
@@ -57,7 +59,7 @@ func searchKeysInSwiftFiles(directory string, keys map[string]struct{}, ignorePa
 
 			// Check if any of the keys are used in the file
 			content := string(fileContent)
-			for key := range keys {
+			for key := range keysMap {
 				if strings.Contains(content, key) {
 					usedKeys[key] = struct{}{}
 				}
