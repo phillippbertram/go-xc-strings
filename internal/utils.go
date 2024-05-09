@@ -150,20 +150,3 @@ func GetLocalizableStringsPath(baseDir, devRegion string) (string, error) {
 
 	return lprojPath, nil
 }
-
-// extracts the key and value from a single line of a .strings file.
-func extractKeyValue(line string) (string, string) {
-	parts := strings.SplitN(line, "=", 2)
-	if len(parts) < 2 {
-		return "", ""
-	}
-	key := strings.Trim(parts[0], " \"")
-	value := strings.Trim(parts[1], " \";")
-	return key, value
-}
-
-// Helper function to extract a key from a line.
-func extractKey(line string) string {
-	key, _ := extractKeyValue(line)
-	return key
-}

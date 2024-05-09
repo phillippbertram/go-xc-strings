@@ -27,6 +27,11 @@ make build
 ./bin/xcs help
 ```
 
+### Setup Development Environment
+
+- Install [Go](https://golang.org/doc/install)
+- Optional: Install golangci-lint: `brew install golangci-lint`
+
 ## Usage
 
 ```bash

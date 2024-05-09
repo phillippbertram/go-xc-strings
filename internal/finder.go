@@ -38,7 +38,7 @@ func findKeysInSwiftFiles(directory string, keys []string, ignorePatterns []stri
 	keysMap := SliceToMap(keys) // more performant
 	usedKeys := make(map[string]struct{})
 
-	filepath.Walk(directory, func(path string, info fs.FileInfo, err error) error {
+	_ = filepath.Walk(directory, func(path string, info fs.FileInfo, err error) error {
 
 		if err != nil {
 			return err

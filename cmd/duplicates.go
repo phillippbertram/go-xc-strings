@@ -70,7 +70,7 @@ var duplicatesCmd = &cobra.Command{
 				fmt.Printf("Removed %d duplicates in %s\n", len(removedLines), file.Path)
 
 				if !duplicatesOptions.dryRun {
-					file.Save()
+					_ = file.Save()
 				}
 			}
 		}

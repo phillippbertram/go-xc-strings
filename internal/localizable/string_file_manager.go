@@ -112,7 +112,7 @@ func (m *StringsFileManager) Sort() {
 func (m *StringsFileManager) Save() {
 	for _, file := range m.Files {
 		fmt.Printf("Saving file: %s\n", file.Path)
-		file.Save()
+		_ = file.Save()
 	}
 }
 
@@ -127,12 +127,12 @@ func (m *StringsFileManager) parseFiles() error {
 			fmt.Printf("Path is a directory: %s\n", path)
 
 			// If it's a directory, walk the directory
-			filepath.WalkDir(path, func(p string, d os.DirEntry, err error) error {
+			_ = filepath.WalkDir(path, func(p string, d os.DirEntry, err error) error {
 				if err != nil {
 					return err
 				}
 				if !d.IsDir() && strings.HasSuffix(d.Name(), ".strings") {
-					m.parseFile(p)
+					_ = m.parseFile(p)
 				}
 				return nil
 			})
@@ -145,7 +145,7 @@ func (m *StringsFileManager) parseFiles() error {
 				continue
 			}
 			for _, match := range matches {
-				m.parseFile(match)
+				_ = m.parseFile(match)
 			}
 		}
 	}
