@@ -1,5 +1,5 @@
 package config
 
 var (
-	Version = "dev"
+	Version = "0.1.0"
 )

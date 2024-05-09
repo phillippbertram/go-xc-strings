@@ -8,11 +8,6 @@ import (
 	"phillipp.io/go-xc-strings/config"
 )
 
-// Global variables to hold flag values for commands
-var stringsReferencePath string
-var swiftDirectory string
-var ignorePatterns []string
-
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "xc-strings",

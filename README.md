@@ -6,8 +6,9 @@ It provides functionalities to find unused localization keys, clean them from `.
 ## Features
 
 - **Find Unused Keys**: Scans Swift files to detect any localization keys that are no longer used.
+- **Find Duplicate Keys**: Scans `.strings` files to detect any duplicate keys within the same file.
 - **Clean `.strings` Files**: Removes unused keys from `.strings` files.
-- **Sort `.strings` Files**: Optionally sorts keys in `.strings` files to maintain a consistent order.
+- **Sort `.strings` Files**: Sorts keys in `.strings` files to maintain a consistent order.
 
 ## Installation
 
@@ -22,48 +23,41 @@ Clone the repository and build the executable:
 ```bash
 git clone git@github.com:phillippbertram/go-xc-strings.git
 cd go-xc-strings
-go build -o xc-strings
+make build
+./bin/xcs help
 ```
+
+### Setup Development Environment
+
+- Install [Go](https://golang.org/doc/install)
+- Optional: Install golangci-lint: `brew install golangci-lint`
 
 ## Usage
 
-### Finding Unused Keys
-
-To find and report unused localization keys:
-
 ```bash
-./xc-strings find -r path/to/Localizable.strings -d path/to/swift/files
-```
+# get help and list all available commands
+xcs help
 
-### Cleaning `.strings` Files
+# list unused localization keys
+# -b: path to the base localization file
+# args: path to the directory containing the Swift files
+# --strings: path to the directory containing the .strings files
+# -i: optional glob pattern to exclude files (useful to ignore R.string generated files)
+xcs unused -b path/to/Localizable.strings -d path/to/swift/files -i "*.generated.swift" App/Resources --remove
 
-To remove unused keys from `.strings` files:
+# sort strings files
+xcs sort App/Resources
 
-```bash
-./xc-strings clean /path/to/project --sort
-```
+# find and remove specific keys from all strings files that are not used in the Swift files
+xcs keys "this_is_a_key" "another_key" AppIOS/Resources --remove
 
-This command will remove unused keys and sort the `.strings` files if the `--sort` flag is provided.
-
-### Dry-Run Mode
-
-To simulate changes without making actual modifications:
-
-```bash
-./xc-strings clean /path/to/project --dry-run
-```
-
-### Sorting `.strings` Files
-
-To sort `.strings` files without removing keys:
-
-```bash
-./xc-strings sort /path/to/strings/files
+# open github repository or release page
+xcs gh [--releases]
 ```
 
 ## Configuration
 
-No additional configuration is needed to run xc-strings.
+No additional configuration is needed to run `xc-strings`.
 
 ## Contributing
 

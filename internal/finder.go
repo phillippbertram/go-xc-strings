@@ -8,35 +8,42 @@ import (
 	"strings"
 )
 
-// FindUnusedKeys locates keys in the .strings file that are not referenced in Swift files.
-func FindUnusedKeys(referenceStringsPath, swiftDirectory string, ignorePatterns []string) ([]string, error) {
-	entries, err := parseStringsFile(referenceStringsPath)
-	if err != nil {
-		return nil, err
-	}
+func FindUnusedKeysInSwiftFiles(directory string, keys []string, ignorePatterns []string) []string {
+	// fmt.Println("Searching for keys in Swift files...")
+	// fmt.Println("Directory:", directory)
+	// fmt.Println("Keys:", len(keys))
+	// fmt.Println("Ignore patterns: ", ignorePatterns)
 
-	keys := make(map[string]struct{})
-	for _, entry := range entries {
-		keys[entry.key] = struct{}{}
-	}
+	keysMap := SliceToMap(keys) // more performant
+	usedKeys := findKeysInSwiftFiles(directory, keys, ignorePatterns)
 
-	usedKeys := searchKeysInSwiftFiles(swiftDirectory, keys, ignorePatterns)
-	unusedKeys := []string{}
-	for key := range keys {
-		if _, found := usedKeys[key]; !found {
-			unusedKeys = append(unusedKeys, key)
+	// get unused keys
+	unusedKeys := make(map[string]struct{})
+	for key := range keysMap {
+		if _, ok := usedKeys[key]; !ok {
+			unusedKeys[key] = struct{}{}
 		}
 	}
-	sort.Strings(unusedKeys)
-	return unusedKeys, nil
+
+	// Map to slice
+	unusedKeysSlice := MapToSlice(unusedKeys)
+
+	// sort the slice
+	sort.Strings(unusedKeysSlice)
+
+	return unusedKeysSlice
 }
 
-func searchKeysInSwiftFiles(directory string, keys map[string]struct{}, ignorePatterns []string) map[string]struct{} {
+func findKeysInSwiftFiles(directory string, keys []string, ignorePatterns []string) map[string]struct{} {
+	keysMap := SliceToMap(keys) // more performant
 	usedKeys := make(map[string]struct{})
-	filepath.Walk(directory, func(path string, info fs.FileInfo, err error) error {
+
+	_ = filepath.Walk(directory, func(path string, info fs.FileInfo, err error) error {
+
 		if err != nil {
 			return err
 		}
+		// fmt.Printf("Processing %s\n", path)
 
 		// Skip directories and files that match the ignore patterns
 		for _, pattern := range ignorePatterns {
@@ -57,7 +64,7 @@ func searchKeysInSwiftFiles(directory string, keys map[string]struct{}, ignorePa
 
 			// Check if any of the keys are used in the file
 			content := string(fileContent)
-			for key := range keys {
+			for key := range keysMap {
 				if strings.Contains(content, key) {
 					usedKeys[key] = struct{}{}
 				}
@@ -65,5 +72,6 @@ func searchKeysInSwiftFiles(directory string, keys map[string]struct{}, ignorePa
 		}
 		return nil
 	})
+
 	return usedKeys
 }

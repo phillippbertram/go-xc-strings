@@ -2,13 +2,22 @@ package cmd
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/spf13/cobra"
-	"phillipp.io/go-xc-strings/internal"
+	"phillipp.io/go-xc-strings/internal/constants"
+	"phillipp.io/go-xc-strings/internal/localizable"
 )
+
+type SortOptions struct {
+	paths        []string
+	dryRun       bool
+	skipSanitize bool
+}
+
+var sortOptions SortOptions = SortOptions{
+	paths: []string{constants.DefaultStringsGlob},
+}
 
 var sortCmd = &cobra.Command{
 	Use:   "sort [path]",
@@ -29,39 +38,41 @@ var sortCmd = &cobra.Command{
 		sort path1/Localizable.strings path2/InfoPlist.strings
 	`),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// Determine the path to sort
-		var paths []string
-		if len(args) == 0 {
-			// If no argument is provided, use the current directory
-			var err error
-			wd, err := os.Getwd()
-			if err != nil {
-				return fmt.Errorf("error getting current directory: %w", err)
-			}
-			paths = []string{wd}
 
+		if len(args) != 0 {
+			sortOptions.paths = args
+		}
+
+		manager, err := localizable.NewStringsFileManager(sortOptions.paths)
+		if err != nil {
+			return fmt.Errorf("error initializing strings manager: %w", err)
+		}
+
+		if sortOptions.dryRun {
+			fmt.Printf("Running in dry-run mode. No changes will be made.\n")
+		}
+
+		manager.Sort()
+
+		if !sortOptions.skipSanitize {
+			manager.Sanitize()
 		} else {
-			paths = append(paths, args...)
+			fmt.Printf("Skipping sanitizing the file\n")
 		}
 
-		for _, pattern := range paths {
-			// Expand the glob pattern to match files and directories
-			matches, err := filepath.Glob(pattern)
-			if err != nil {
-				return fmt.Errorf("error processing glob pattern '%s': %w", pattern, err)
-			}
-			for _, match := range matches {
-				err := internal.SortStringsFiles(match)
-				if err != nil {
-					return fmt.Errorf("error sorting files in '%s': %w", match, err)
-				}
-			}
+		if !sortOptions.dryRun {
+			manager.Save()
+		} else {
+			fmt.Printf("Dry-run completed. No changes were made.\n")
 		}
-		fmt.Println("Sorting completed successfully.")
+
 		return nil
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(sortCmd)
+
+	sortCmd.Flags().BoolVar(&sortOptions.dryRun, "dry-run", false, "Prints the changes without writing them to the file")
+	sortCmd.Flags().BoolVar(&sortOptions.skipSanitize, "skip-sanitize", false, "Skips sanitizing the file after sorting")
 }
