@@ -10,4 +10,7 @@ var DefaultIgnorePatterns = []string{
 	"*.generated.swift",
 }
 
-var DefaultStringsGlob = "*.strings"
+const DefaultStringsGlob = "*.strings"
+
+const GithubPage = "https://github.com/phillippbertram/go-xc-strings"
+const GithubReleasesPage = "https://github.com/phillippbertram/go-xc-strings/releases"
