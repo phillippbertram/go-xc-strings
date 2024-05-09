@@ -59,7 +59,7 @@ var unusedCmd = &cobra.Command{
 		s.Start()
 
 		keysForBaseStrings := manager.GetKeysForFile(unusedOptions.baseStringsPath)
-		unusedKeys := internal.SearchKeysInSwiftFiles(unusedOptions.swiftDirectory, keysForBaseStrings, unusedOptions.ignorePatterns)
+		unusedKeys := internal.FindUnusedKeysInSwiftFiles(unusedOptions.swiftDirectory, keysForBaseStrings, unusedOptions.ignorePatterns)
 		s.Stop()
 
 		if len(unusedKeys) == 0 {

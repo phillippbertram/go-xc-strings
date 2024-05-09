@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -9,15 +8,35 @@ import (
 	"strings"
 )
 
-func SearchKeysInSwiftFiles(directory string, keys []string, ignorePatterns []string) []string {
-	fmt.Println("Searching for keys in Swift files...")
-	fmt.Println("Directory:", directory)
-	fmt.Println("Keys:", len(keys))
-	fmt.Println("Ignore patterns: ", ignorePatterns)
+func FindUnusedKeysInSwiftFiles(directory string, keys []string, ignorePatterns []string) []string {
+	// fmt.Println("Searching for keys in Swift files...")
+	// fmt.Println("Directory:", directory)
+	// fmt.Println("Keys:", len(keys))
+	// fmt.Println("Ignore patterns: ", ignorePatterns)
 
 	keysMap := SliceToMap(keys) // more performant
-	usedKeys := make(map[string]struct{})
+	usedKeys := findKeysInSwiftFiles(directory, keys, ignorePatterns)
+
+	// get unused keys
 	unusedKeys := make(map[string]struct{})
+	for key := range keysMap {
+		if _, ok := usedKeys[key]; !ok {
+			unusedKeys[key] = struct{}{}
+		}
+	}
+
+	// Map to slice
+	unusedKeysSlice := MapToSlice(unusedKeys)
+
+	// sort the slice
+	sort.Strings(unusedKeysSlice)
+
+	return unusedKeysSlice
+}
+
+func findKeysInSwiftFiles(directory string, keys []string, ignorePatterns []string) map[string]struct{} {
+	keysMap := SliceToMap(keys) // more performant
+	usedKeys := make(map[string]struct{})
 
 	filepath.Walk(directory, func(path string, info fs.FileInfo, err error) error {
 
@@ -54,18 +73,5 @@ func SearchKeysInSwiftFiles(directory string, keys []string, ignorePatterns []st
 		return nil
 	})
 
-	// get unused keys
-	for key := range keysMap {
-		if _, ok := usedKeys[key]; !ok {
-			unusedKeys[key] = struct{}{}
-		}
-	}
-
-	// Map to slice
-	unusedKeysSlice := MapToSlice(unusedKeys)
-
-	// sort the slice
-	sort.Strings(unusedKeysSlice)
-
-	return unusedKeysSlice
+	return usedKeys
 }
