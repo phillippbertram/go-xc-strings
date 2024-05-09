@@ -43,8 +43,6 @@ var findKeysCmd = &cobra.Command{
 			keysOptions.keys = args[:len(args)-1]
 		}
 
-		// TODO: when no key is provided, return all available keys
-
 		keysOptions.path = args[len(args)-1]
 		manager, err := localizable.NewStringsFileManager([]string{keysOptions.path})
 		if err != nil {
@@ -57,7 +55,7 @@ var findKeysCmd = &cobra.Command{
 			for _, key := range keys {
 				fmt.Printf("%s\n", key)
 			}
-			color.Green("Found %d keys in %d files\n", len(keys), len(manager.Files))
+			color.Green("Found %d unique keys in %d files\n", len(keys), len(manager.Files))
 			return nil
 		}
 
@@ -95,6 +93,7 @@ var findKeysCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(findKeysCmd)
 
+	// TODO: exclude certain language files
 	// removeCmd.Flags().StringArrayVarP(&excludeLanguages, "exclude", "e", []string{}, "Exclude languages from the operation")
 	findKeysCmd.Flags().BoolVar(&keysOptions.removeKeys, "remove", false, "Remove the key from the .strings file")
 	findKeysCmd.Flags().BoolVar(&keysOptions.dryRun, "dry-run", false, "Run the command without making any changes")

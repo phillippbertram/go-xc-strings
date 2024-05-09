@@ -37,8 +37,10 @@ var unusedCmd = &cobra.Command{
 		unused -b Localizable.strings
 		unused -b Localizable.strings -d Sources/MyApp -i "Pods/*" "Carthage/*" "*.generated.swift"
 	`),
-	Args: cobra.NoArgs,
+	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+
+		unusedOptions.stringsPath = args[0]
 
 		if unusedOptions.baseStringsPath == "" {
 			return fmt.Errorf("base Localizable.strings file is required")
@@ -84,7 +86,7 @@ var unusedCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(unusedCmd)
 	unusedCmd.Flags().StringVarP(&unusedOptions.baseStringsPath, "base", "b", "", "Path to the base Localizable.strings file which is used as reference for finding unused keys (required)")
-	unusedCmd.Flags().StringVarP(&unusedOptions.stringsPath, "strings", "p", constants.DefaultStringsGlob, "Path to the directory containing the Localizable.string files (.)")
+	//unusedCmd.Flags().StringVarP(&unusedOptions.stringsPath, "strings", "p", constants.DefaultStringsGlob, "Path to the directory containing the Localizable.string files (.)")
 	unusedCmd.Flags().StringVarP(&unusedOptions.swiftDirectory, "swift-dir", "d", "", "Path to the directory containing Swift files (.)")
 	unusedCmd.Flags().StringSliceVarP(&unusedOptions.ignorePatterns, "ignore", "i", constants.DefaultIgnorePatterns, "Glob patterns for files or directories to ignore")
 	unusedCmd.Flags().BoolVar(&unusedOptions.removeUnused, "remove", false, "Remove unused keys from the .strings file")
