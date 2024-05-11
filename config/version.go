@@ -1,5 +1,8 @@
 package config
 
+// these variables are set by ldflags using goreleaser
 var (
-	Version = "0.1.0"
+	Version   = "dev"
+	Commit    = ""
+	BuildDate = ""
 )
