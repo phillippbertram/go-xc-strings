@@ -7,7 +7,6 @@ It provides functionalities to find unused localization keys, clean them from `.
 
 - **Find Unused Keys**: Scans Swift files to detect any localization keys that are no longer used.
 - **Find Duplicate Keys**: Scans `.strings` files to detect any duplicate keys within the same file.
-- **Clean `.strings` Files**: Removes unused keys from `.strings` files.
 - **Sort `.strings` Files**: Sorts keys in `.strings` files to maintain a consistent order.
 
 ## Installation
@@ -31,6 +30,7 @@ make build
 
 - Install [Go](https://golang.org/doc/install)
 - Optional: Install golangci-lint: `brew install golangci-lint`
+- Optional: Install goreleaser: `brew install goreleaser`
 
 ## Usage
 
