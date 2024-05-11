@@ -7,6 +7,10 @@ lint:
 
 build:
 	@echo "Building..."
+	@goreleaser release --snapshot --clean --single-target
+
+build/all:
+	@echo "Building..."
 	@goreleaser release --snapshot --clean
 
 release/local:
