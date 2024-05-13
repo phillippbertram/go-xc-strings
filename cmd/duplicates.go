@@ -73,12 +73,12 @@ var duplicatesCmd = &cobra.Command{
 					_ = file.Save()
 				}
 			}
-		}
 
-		if duplicatesOptions.dryRun {
-			color.Yellow("Dry-run completed. No changes were made.")
-		} else {
-			color.Green("All duplicates removed successfully.")
+			if duplicatesOptions.dryRun {
+				color.Yellow("Dry-run completed. No changes were made.")
+			} else {
+				color.Green("All duplicates removed successfully.")
+			}
 		}
 
 		return nil
