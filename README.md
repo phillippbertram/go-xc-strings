@@ -22,8 +22,13 @@ Clone the repository and build the executable:
 ```bash
 git clone git@github.com:phillippbertram/go-xc-strings.git
 cd go-xc-strings
+
+# run directly
+go run main.go help
+
+# build and run the executable (macOS)
 make build
-./bin/xcs help
+./dist/go-xc-strings_darwin_arm64/xcs help
 ```
 
 ### Setup Development Environment
