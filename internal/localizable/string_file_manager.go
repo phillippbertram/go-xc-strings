@@ -49,7 +49,6 @@ func (m *StringsFileManager) GetAllKeys() []string {
 		uniqueKeys = append(uniqueKeys, key)
 	}
 
-	// sort uniquekeys
 	sort.Strings(uniqueKeys)
 
 	return uniqueKeys
@@ -72,7 +71,6 @@ func (m *StringsFileManager) GetKeysForFile(file string) []string {
 		uniqueKeys = append(uniqueKeys, key)
 	}
 
-	// sort uniquekeys
 	sort.Strings(uniqueKeys)
 
 	return uniqueKeys
