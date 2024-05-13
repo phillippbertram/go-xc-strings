@@ -7,7 +7,6 @@ It provides functionalities to find unused localization keys, clean them from `.
 
 - **Find Unused Keys**: Scans Swift files to detect any localization keys that are no longer used.
 - **Find Duplicate Keys**: Scans `.strings` files to detect any duplicate keys within the same file.
-- **Clean `.strings` Files**: Removes unused keys from `.strings` files.
 - **Sort `.strings` Files**: Sorts keys in `.strings` files to maintain a consistent order.
 
 ## Installation
@@ -23,14 +22,20 @@ Clone the repository and build the executable:
 ```bash
 git clone git@github.com:phillippbertram/go-xc-strings.git
 cd go-xc-strings
+
+# run directly
+go run main.go help
+
+# build and run the executable (macOS)
 make build
-./bin/xcs help
+./dist/go-xc-strings_darwin_arm64/xcs help
 ```
 
 ### Setup Development Environment
 
 - Install [Go](https://golang.org/doc/install)
 - Optional: Install golangci-lint: `brew install golangci-lint`
+- Optional: Install goreleaser: `brew install goreleaser`
 
 ## Usage
 

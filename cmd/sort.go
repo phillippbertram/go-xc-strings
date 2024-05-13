@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/MakeNowJust/heredoc"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"phillipp.io/go-xc-strings/internal/constants"
 	"phillipp.io/go-xc-strings/internal/localizable"
@@ -49,7 +50,7 @@ var sortCmd = &cobra.Command{
 		}
 
 		if sortOptions.dryRun {
-			fmt.Printf("Running in dry-run mode. No changes will be made.\n")
+			color.Yellow("Running in dry-run mode. No changes will be made.\n")
 		}
 
 		manager.Sort()
@@ -63,7 +64,7 @@ var sortCmd = &cobra.Command{
 		if !sortOptions.dryRun {
 			manager.Save()
 		} else {
-			fmt.Printf("Dry-run completed. No changes were made.\n")
+			color.Yellow("Dry-run completed. No changes were made.\n")
 		}
 
 		return nil
