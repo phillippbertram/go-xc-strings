@@ -86,7 +86,6 @@ var unusedCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(unusedCmd)
 	unusedCmd.Flags().StringVarP(&unusedOptions.baseStringsPath, "base", "b", "", "Path to the base Localizable.strings file which is used as reference for finding unused keys (required)")
-	//unusedCmd.Flags().StringVarP(&unusedOptions.stringsPath, "strings", "p", constants.DefaultStringsGlob, "Path to the directory containing the Localizable.string files (.)")
 	unusedCmd.Flags().StringVarP(&unusedOptions.swiftDirectory, "swift-dir", "d", "", "Path to the directory containing Swift files (.)")
 	unusedCmd.Flags().StringSliceVarP(&unusedOptions.ignorePatterns, "ignore", "i", constants.DefaultIgnorePatterns, "Glob patterns for files or directories to ignore")
 	unusedCmd.Flags().BoolVar(&unusedOptions.removeUnused, "remove", false, "Remove unused keys from the .strings file")

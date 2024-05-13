@@ -14,6 +14,10 @@ type Line struct {
 	LineNumber int    // Line number in the file
 }
 
+func (l Line) IsKeyValue() bool {
+	return l.Key != "" // TODO: necessary= && strings.Contains(l.Text, "=")
+}
+
 type FileInfoSummary struct {
 	FilePath       string
 	TotalKeys      int
@@ -127,6 +131,26 @@ func (sf *StringsFile) FindDuplicateKeys() map[string][]Line {
 	return duplicates
 }
 
+// HasDuplicates checks if the file has any duplicate keys
+func (sf *StringsFile) HasDuplicates() bool {
+	duplicates := sf.FindDuplicateKeys()
+	return len(duplicates) > 0
+}
+
+func (sf *StringsFile) EmptyValues() []Line {
+	var emptyLines []Line
+	for _, line := range sf.Lines {
+		if line.Key != "" && line.Value == "" {
+			emptyLines = append(emptyLines, line)
+		}
+	}
+	return emptyLines
+}
+
+func (sf *StringsFile) HasEmptyValues() bool {
+	return len(sf.EmptyValues()) > 0
+}
+
 // RemoveKey removes all lines with the specified key and returns them
 func (sf *StringsFile) RemoveKey(key string) []Line {
 	var removedLines []Line
@@ -223,29 +247,43 @@ func (sf *StringsFile) IsSorted() bool {
 	return true // If all keys are in order or there are no keys, the file is sorted
 }
 
+func (sf *StringsFile) IsSanitized() bool {
+	for _, line := range sf.Lines {
+		sanitizedText := sanitizeLine(&line)
+		if sanitizedText != line.Text {
+			return false
+		}
+	}
+
+	return true
+}
+
 // Sanitize trims leading and trailing white spaces from the entire line and ensures key-value pairs are formatted correctly
 func (sf *StringsFile) Sanitize() {
 	for i, line := range sf.Lines {
-		// Trim leading and trailing white spaces from the entire line
-		trimmedLine := strings.TrimSpace(line.Text)
-
-		// for each key-value pair
-		if line.Key != "" && strings.Contains(trimmedLine, "=") { // This is a key-value pair
-			// Split around the '=' sign and remove all extra spaces around keys and values
-			parts := strings.SplitN(trimmedLine, "=", 2)
-			if len(parts) == 2 {
-				key := strings.TrimSpace(parts[0])
-				value := strings.TrimSpace(parts[1])
-
-				// Ensure value is trimmed of semicolons and extra spaces, then add one semicolon back
-				value = strings.TrimRight(value, ";")
-				trimmedLine = key + "=" + value + ";" // Reformat the line properly
-			}
-		}
-
-		// Update the line in the slice
-		sf.Lines[i].Text = trimmedLine
+		sanitizedText := sanitizeLine(&line)
+		sf.Lines[i].Text = sanitizedText
 	}
+}
+
+func sanitizeLine(line *Line) string {
+	// Trim leading and trailing white spaces from the entire line
+	trimmedLine := strings.TrimSpace(line.Text)
+
+	// for each key-value pair
+	if line.IsKeyValue() { // This is a key-value pair
+		// Split around the '=' sign and remove all extra spaces around keys and values
+		parts := strings.SplitN(trimmedLine, "=", 2)
+		if len(parts) == 2 {
+			key := strings.TrimSpace(parts[0])
+			value := strings.TrimSpace(parts[1])
+
+			// Ensure value is trimmed of semicolons and extra spaces, then add one semicolon back
+			value = strings.TrimRight(value, ";")
+			trimmedLine = key + "=" + value + ";" // Reformat the line properly
+		}
+	}
+	return trimmedLine
 }
 
 // Save writes the StringsFile back to the file
