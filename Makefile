@@ -1,4 +1,5 @@
 
+default: build
 
 .PHONY: lint
 lint:

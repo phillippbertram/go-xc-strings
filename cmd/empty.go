@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"phillipp.io/go-xc-strings/internal/constants"
 	"phillipp.io/go-xc-strings/internal/localizable"
@@ -30,15 +31,16 @@ var emptyCmd = &cobra.Command{
 			return fmt.Errorf("error initializing strings manager: %w", err)
 		}
 
-		for _, file := range manager.Files {
-			lines := file.Lines
-			for _, line := range lines {
-				if line.Key != "" {
-					if line.Value == "" {
-						fmt.Printf("Empty translation value in %s: %s\n", file.Path, line.Key)
-					}
-				}
+		for idx, file := range manager.Files {
+			fmt.Printf("Checking %s\n", file.Path)
+			emptyLines := file.EmptyValues()
 
+			for _, line := range emptyLines {
+				color.Yellow("Empty translation for: %s\n", line.Key)
+			}
+
+			if idx < len(manager.Files)-1 {
+				fmt.Println()
 			}
 		}
 

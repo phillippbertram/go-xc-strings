@@ -3,6 +3,7 @@
 "settings_screen_title"="Settings1";
 "settings_screen_theme_dark"=   "Dark";
 "general_dialog_ok" ="OK";
+"some_empty"="";
 
 "settings_screen_logout_button_title" ="logout";
 "settings_screen_theme_light"="Light";
