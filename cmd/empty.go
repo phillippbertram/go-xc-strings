@@ -3,10 +3,11 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/phillippbertram/xc-strings/internal/constants"
+	"github.com/phillippbertram/xc-strings/internal/localizable"
+
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
-	"phillipp.io/go-xc-strings/internal/constants"
-	"phillipp.io/go-xc-strings/internal/localizable"
 )
 
 // command to find empty translation values
