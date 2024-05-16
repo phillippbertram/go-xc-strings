@@ -1,4 +1,4 @@
-module phillipp.io/go-xc-strings
+module github.com/phillippbertram/xc-strings
 
 go 1.21.6
 

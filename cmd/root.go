@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/phillippbertram/xc-strings/config"
+
 	"github.com/spf13/cobra"
-	"phillipp.io/go-xc-strings/config"
 )
 
 // rootCmd represents the base command when called without any subcommands

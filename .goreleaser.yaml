@@ -27,9 +27,9 @@ builds:
 
     ldflags: >
       -s -w
-      -X 'phillipp.io/go-xc-strings/config.Version={{.Version}}'
-      -X 'phillipp.io/go-xc-strings/config.Commit={{.Commit}}'
-      -X 'phillipp.io/go-xc-strings/config.BuildDate={{.Date}}'
+      -X 'github.com/phillippbertram/xc-strings/config.Version={{.Version}}'
+      -X 'github.com/phillippbertram/xc-strings/config.Commit={{.Commit}}'
+      -X 'github.com/phillippbertram/xc-strings/config.BuildDate={{.Date}}'
 
 archives:
   - format: tar.gz

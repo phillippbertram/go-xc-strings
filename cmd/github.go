@@ -1,10 +1,11 @@
 package cmd
 
 import (
+	"github.com/phillippbertram/xc-strings/internal/constants"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
-	"phillipp.io/go-xc-strings/internal/constants"
 )
 
 type GithubOptions struct {

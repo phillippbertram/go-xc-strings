@@ -1,7 +1,7 @@
 package main
 
 import (
-	"phillipp.io/go-xc-strings/cmd"
+	"github.com/phillippbertram/xc-strings/cmd"
 )
 
 func main() {
