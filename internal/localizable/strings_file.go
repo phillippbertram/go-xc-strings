@@ -189,7 +189,30 @@ func (sf *StringsFile) Sort() {
 				// Add an empty line to separate groups
 				sortedLines = append(sortedLines, Line{Text: ""})
 			}
-			currentPrefix = string(line.Key[0]) // Using the first character as prefix
+
+			// keys are in the following format:
+			// someView_component_title
+			// someView_component_subtitle
+			//
+			// or
+			// someView.component.title
+			// someView.component.subtitle
+
+			// Split the key by underscore and use the first part as the prefix
+			parts := strings.Split(line.Key, "_")
+			if len(parts) > 1 {
+				currentPrefix = parts[0] + "_"
+			} else {
+				// If the key is not split by underscore, split by dot
+				parts = strings.Split(line.Key, ".")
+				if len(parts) > 1 {
+					currentPrefix = parts[0] + "."
+				} else {
+					// If the key is not split by underscore or dot, use the entire key as the prefix
+					currentPrefix = line.Key
+				}
+			}
+
 		}
 		sortedLines = append(sortedLines, line)
 	}

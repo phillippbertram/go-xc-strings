@@ -67,6 +67,14 @@ xcs gh [--releases]
 
 No additional configuration is needed to run `xc-strings`.
 
+## Publish New Release (DRAFT)
+
+1. Make sure you are on the `main` branch
+2. Make sure the version in `version.go` is correctly set during goreleaser build
+3. Create a tag: `git tag -a v0.1.0 -m "Release v0.1.0"` and push it: `git push origin v0.1.0`
+4. Run `make release/local` to create a new release
+5. Publish Draft [Release](https://github.com/phillippbertram/go-xc-strings/releases) 
+
 ## Contributing
 
 Contributions are welcome! Please fork the repository and submit pull requests with any enhancements or bug fixes.
