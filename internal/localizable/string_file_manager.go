@@ -53,6 +53,16 @@ func (m *StringsFileManager) GetAllKeys() []string {
 
 	return uniqueKeys
 }
+
+func (m *StringsFileManager) GetFile(path string) *StringsFile {
+	for _, file := range m.Files {
+		if file.Path == path {
+			return file
+		}
+	}
+	return nil
+}
+
 func (m *StringsFileManager) GetKeysForFile(file string) []string {
 	keys := make(map[string]struct{})
 	for _, f := range m.Files {
