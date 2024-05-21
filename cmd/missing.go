@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/MakeNowJust/heredoc"
 	"github.com/fatih/color"
 	"github.com/phillippbertram/xc-strings/internal/localizable"
 	"github.com/spf13/cobra"
@@ -16,9 +17,13 @@ type MissingCmdOptions struct {
 var missingOptions MissingCmdOptions = MissingCmdOptions{}
 
 var missingCmd = &cobra.Command{
-	Use:   "missing",
-	Short: "Find missing keys in the strings files",
-	Args:  cobra.ExactArgs(1),
+	Use:   "missing [strings-path] -b <base Localizable.strings>",
+	Short: "Find missing translations in the strings files",
+	Example: heredoc.Doc(`
+		# find missing translations in all .strings files in the current directory and its subdirectories
+		xcs missing App/Resources -b App/Resources/en.lproj/Localizable.strings
+	`),
+	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		missingOptions.stringsPath = args[0]
 		return findMissingKeys(missingOptions)

@@ -54,7 +54,10 @@ xcs unused -b path/to/Localizable.strings -d path/to/swift/files -i "*.generated
 xcs sort App/Resources
 
 # find and remove specific keys from all strings files that are not used in the Swift files
-xcs keys "this_is_a_key" "another_key" AppIOS/Resources --remove
+xcs keys "this_is_a_key" "another_key" App/Resources --remove
+
+# find missing translations
+xcs missing App/Resources -b App/Resources/en.lproj/Localizable.strings
 
 # open github repository or release page
 xcs gh [--releases]
