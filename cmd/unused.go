@@ -30,7 +30,7 @@ var unusedOptions UnusedOptions = UnusedOptions{
 }
 
 var unusedCmd = &cobra.Command{
-	Use:   "unused -b <Localizable.strings> [-d <path to swift code>] [-i <ignore pattern>...]",
+	Use:   "unused [strings-path] -b <Localizable.strings> [-d <path to swift code>] [-i <ignore pattern>...]",
 	Short: "Finds unused keys in .strings files",
 	Long: heredoc.Doc(
 		`Check for localization keys defined in a .strings file that are not used in any Swift file within a specified directory.`),

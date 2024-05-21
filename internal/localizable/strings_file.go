@@ -100,7 +100,6 @@ func (sf *StringsFile) GetLinesForKey(key string) []Line {
 	for _, line := range sf.Lines {
 		if line.Key == key {
 			linesForKey = append(linesForKey, line)
-
 		}
 	}
 
