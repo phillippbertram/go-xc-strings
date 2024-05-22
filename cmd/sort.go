@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/phillippbertram/xc-strings/config"
 	"github.com/phillippbertram/xc-strings/internal/constants"
 	"github.com/phillippbertram/xc-strings/internal/localizable"
 
@@ -39,8 +40,9 @@ var sortCmd = &cobra.Command{
 		# sort a specific .strings file
 		sort path1/Localizable.strings path2/InfoPlist.strings
 	`),
+	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-
+		sortOptions.paths = []string{config.Cfg.StringsPath}
 		if len(args) != 0 {
 			sortOptions.paths = args
 		}
