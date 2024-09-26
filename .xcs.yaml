@@ -1,0 +1,6 @@
+# project: MyProject.xcodeproj
+# ignorePattern:
+
+baseStringsFile: example/Localizable/en.lproj/Localizable.strings
+stringsPath: example/Localizable
+swiftPath: example/Swift

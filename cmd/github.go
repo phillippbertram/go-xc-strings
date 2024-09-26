@@ -26,6 +26,7 @@ var githubCmd = &cobra.Command{
 	`),
 	Args: cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		// print config
 		if githubOptions.showRelease {
 			return browser.OpenURL(constants.GithubReleasesPage)
 		} else {
@@ -37,5 +38,4 @@ var githubCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(githubCmd)
 	githubCmd.Flags().BoolVar(&githubOptions.showRelease, "releases", false, "Show releases")
-
 }
