@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/MakeNowJust/heredoc"
 	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
 
@@ -21,6 +22,11 @@ type CheckOptions struct {
 	swiftDirectory  string
 	baseStringsPath string
 	ignorePatterns  []string
+
+	checkSorting     bool
+	checkDuplicates  bool
+	checkEmptyValues bool
+	checkUnused      bool
 }
 
 var checkOptions CheckOptions = CheckOptions{
@@ -28,9 +34,25 @@ var checkOptions CheckOptions = CheckOptions{
 }
 
 var checkCmd = &cobra.Command{
-	Use:   "check [path]",
+	Use:   "check -b [path to base strings file] -d [path to Swift directory] [path to strings file(s)] ",
 	Short: "Check for issues in .strings files",
-	Args:  cobra.MaximumNArgs(1),
+	Example: heredoc.Doc(`
+		# Run all checks (sorting, duplicates, empty values, unused keys):
+		$ xcs check
+
+		# Run only the sorting check:
+		$ xcs check --check-sorting
+
+		# Run the sorting and duplicate checks only:
+		$ xcs check --check-sorting --check-duplicates
+
+		# Specify a base Localizable.strings file and a Swift directory:
+		$ xcs check -b ./Base.lproj/Localizable.strings -d ./Sources
+
+		# Specify a strings file to check and ignore certain patterns:
+		$ xcs check -b ./Base.lproj/Localizable.strings -d ./Sources --ignore "test/*,docs/*"
+	`),
+	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 
 		if len(args) > 0 {
@@ -39,12 +61,25 @@ var checkCmd = &cobra.Command{
 			checkOptions.stringsPath = constants.DefaultStringsGlob
 		}
 
-		if checkOptions.baseStringsPath == "" {
-			return fmt.Errorf("base Localizable.strings file is required")
+		if checkOptions.baseStringsPath == "" && checkOptions.checkUnused {
+			return fmt.Errorf("base Localizable.strings file is required for unused key check")
 		}
 
 		if checkOptions.swiftDirectory == "" {
 			checkOptions.swiftDirectory = "."
+		}
+		// check if any `--check` flag was set
+		checkSortingFlag := cmd.Flags().Changed("check-sorting")
+		checkDuplicatesFlag := cmd.Flags().Changed("check-duplicates")
+		checkEmptyValuesFlag := cmd.Flags().Changed("check-empty-values")
+		checkUnusedFlag := cmd.Flags().Changed("check-unused")
+
+		// if no `--check` flag was set, set all check.options to true
+		if !checkSortingFlag && !checkDuplicatesFlag && !checkEmptyValuesFlag && !checkUnusedFlag {
+			checkOptions.checkSorting = true
+			checkOptions.checkDuplicates = true
+			checkOptions.checkEmptyValues = true
+			checkOptions.checkUnused = true
 		}
 
 		manager, err := localizable.NewStringsFileManager([]string{checkOptions.stringsPath})
@@ -62,25 +97,31 @@ var checkCmd = &cobra.Command{
 
 		for _, file := range manager.Files {
 
-			// check if strings needs sorting
-			if !file.IsSorted() || !file.IsSanitized() {
+			// Check for sorting if enabled
+			if checkOptions.checkSorting && (!file.IsSorted() || !file.IsSanitized()) {
 				unsortedFiles = append(unsortedFiles, file)
 			}
 
-			// check if strings has duplicates
-			if file.HasDuplicates() {
+			// Check for duplicates if enabled
+			if checkOptions.checkDuplicates && file.HasDuplicates() {
 				filesWithDuplicates = append(filesWithDuplicates, file)
 			}
 
-			// check if strings has empty values
-			if file.HasEmptyValues() {
+			// Check for empty values if enabled
+			if checkOptions.checkEmptyValues && file.HasEmptyValues() {
 				filesWithEmptyValues = append(filesWithEmptyValues, file)
 			}
 		}
 
-		// TODO: check if strings has unused keys
-		keysForBaseStrings := manager.GetKeysForFile(checkOptions.baseStringsPath)
-		unusedKeys := internal.FindUnusedKeysInSwiftFiles(checkOptions.swiftDirectory, keysForBaseStrings, checkOptions.ignorePatterns)
+		// Check for unused keys if enabled
+		var unusedKeys []string
+		if checkOptions.checkUnused {
+			keysForBaseStrings := manager.GetKeysForFile(checkOptions.baseStringsPath)
+			unusedKeys = internal.FindUnusedKeysInSwiftFiles(checkOptions.swiftDirectory, keysForBaseStrings, checkOptions.ignorePatterns)
+		}
+
+		// Stop spinner before showing results
+		s.Stop()
 
 		if len(unsortedFiles) > 0 {
 			color.Yellow("Unsorted files (%d): ", len(unsortedFiles))
@@ -111,18 +152,15 @@ var checkCmd = &cobra.Command{
 		}
 
 		anyIssuesOccurred := len(unsortedFiles) > 0 || len(filesWithDuplicates) > 0 || len(filesWithEmptyValues) > 0 || len(unusedKeys) > 0
-		if !anyIssuesOccurred {
+		if anyIssuesOccurred {
+			color.Red("Issues found. 🚧")
+			if checkOptions.exitOnIssue {
+				os.Exit(1)
+			}
+		} else {
 			color.Green("No issues found. 🚀")
-			return nil
-		}
-		color.Red("Issues found. 🚧")
-
-		if checkOptions.exitOnIssue && anyIssuesOccurred {
-			os.Exit(1)
-			panic("Should not reach here.")
 		}
 
-		fmt.Printf("Unsorted files: %d\n", len(unsortedFiles))
 		return nil
 	},
 }
@@ -132,4 +170,10 @@ func init() {
 	checkCmd.Flags().StringVarP(&checkOptions.baseStringsPath, "base", "b", "", "Path to the base Localizable.strings file which is used as reference for finding unused keys (required)")
 	checkCmd.Flags().StringVarP(&checkOptions.swiftDirectory, "swift-dir", "d", "", "Path to the directory containing Swift files (.)")
 	checkCmd.Flags().StringSliceVarP(&checkOptions.ignorePatterns, "ignore", "i", constants.DefaultIgnorePatterns, "Glob patterns for files or directories to ignore")
+
+	// Default all checks to false
+	checkCmd.Flags().BoolVar(&checkOptions.checkSorting, "check-sorting", false, "Enable or disable sorting check")
+	checkCmd.Flags().BoolVar(&checkOptions.checkDuplicates, "check-duplicates", false, "Enable or disable duplicate check")
+	checkCmd.Flags().BoolVar(&checkOptions.checkEmptyValues, "check-empty-values", false, "Enable or disable empty values check")
+	checkCmd.Flags().BoolVar(&checkOptions.checkUnused, "check-unused", false, "Enable or disable unused keys check")
 }
